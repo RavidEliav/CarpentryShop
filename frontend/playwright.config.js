@@ -25,8 +25,11 @@ export default defineConfig({
       command: `uv run uvicorn app.main:app --port ${API_PORT}`,
       cwd: '../backend',
       url: `http://localhost:${API_PORT}/api/health`,
-      // No key: E2E never calls OpenAI (it would read backend/.env otherwise). Agent tests mock /api.
-      env: { APP_ENV: 'e2e', CORS_ORIGINS: `http://localhost:${WEB_PORT}`, OPENAI_API_KEY: '' },
+      // No keys: E2E never calls OpenAI or Supabase (it would read backend/.env otherwise). Agent tests
+      // mock /api; saved designs go to the backend's in-memory store (APP_ENV=e2e).
+      env: {
+        APP_ENV: 'e2e', CORS_ORIGINS: `http://localhost:${WEB_PORT}`, OPENAI_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '',
+      },
       reuseExistingServer: false,
       timeout: 60_000,
     },

@@ -35,11 +35,13 @@ async function request(path, fetchImpl, init) {
 }
 
 const getJson = (path, fetchImpl) => request(path, fetchImpl);
-const postJson = (path, payload, fetchImpl) => request(path, fetchImpl, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const sendJson = (method, path, payload, fetchImpl, headers = {}) => request(path, fetchImpl, {
+  method,
+  headers: { 'Content-Type': 'application/json', ...headers },
   body: JSON.stringify(payload),
 });
+const postJson = (path, payload, fetchImpl) => sendJson('POST', path, payload, fetchImpl);
+const designPath = (designId) => `/api/designs/${encodeURIComponent(designId)}`;
 
 export const getHealth = (fetchImpl = fetch) => getJson('/api/health', fetchImpl).then((data) => ({ success: true, data }));
 
@@ -83,3 +85,17 @@ export async function fetchSpeech(payload, fetchImpl = fetch) {
 
 /** Apply a signed proposal: { design, revision, proposal } -> { design, revision }. 409 = stale. */
 export const applyProposal = (payload, fetchImpl = fetch) => postJson('/api/proposals/apply', payload, fetchImpl);
+
+/** Save a new design: -> { designId, accessToken, revision }. The token is only ever returned here. */
+export const createDesign = (design, fetchImpl = fetch) => postJson('/api/designs', { design }, fetchImpl);
+
+/** Open a saved design with its link: -> { design, revision }. 404 = wrong or unknown link. */
+export const loadDesign = ({ designId, token }, fetchImpl = fetch) => request(designPath(designId), fetchImpl, {
+  headers: { Authorization: `Bearer ${token}` },
+  cache: 'no-store',
+});
+
+/** Save changes made since `revision`: -> { revision }. 409 = it was changed elsewhere meanwhile. */
+export const updateDesign = ({ designId, token }, revision, design, fetchImpl = fetch) => sendJson(
+  'PUT', designPath(designId), { design }, fetchImpl, { Authorization: `Bearer ${token}`, 'If-Match': `"${revision}"` },
+);

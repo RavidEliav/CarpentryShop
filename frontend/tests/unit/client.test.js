@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ApiError, applyProposal, getCatalog, getDefaultDesign, getHealth, sendChat } from '../../src/api/client.js';
+import {
+  ApiError, applyProposal, createDesign, getCatalog, getDefaultDesign, getHealth, loadDesign, sendChat, updateDesign,
+} from '../../src/api/client.js';
 
 const okResponse = (body) => vi.fn().mockResolvedValue({ ok: true, json: async () => body });
 
@@ -45,5 +47,44 @@ describe('agent api', () => {
   it('reports network failures as status 0', async () => {
     const error = await sendChat({}, vi.fn().mockRejectedValue(new TypeError('offline'))).catch((e) => e);
     expect(error).toMatchObject({ status: 0, code: 'NETWORK_ERROR' });
+  });
+});
+
+describe('saved designs api', () => {
+  const link = { designId: '3f1c2b4a-1111-4222-8333-444455556666', token: 'x'.repeat(43) };
+
+  it('creates a design with a JSON POST', async () => {
+    const fetchImpl = okResponse({ success: true, data: { designId: link.designId, accessToken: link.token, revision: 1 } });
+    await expect(createDesign({ width: 1 }, fetchImpl)).resolves.toEqual({ designId: link.designId, accessToken: link.token, revision: 1 });
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe('http://localhost:8000/api/designs');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body)).toEqual({ design: { width: 1 } });
+  });
+
+  it('opens a design with the token as a bearer key, never in the URL', async () => {
+    const fetchImpl = okResponse({ success: true, data: { design: {}, revision: 3 } });
+    await expect(loadDesign(link, fetchImpl)).resolves.toEqual({ design: {}, revision: 3 });
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe(`http://localhost:8000/api/designs/${link.designId}`);
+    expect(url).not.toContain(link.token);
+    expect(init.headers).toEqual({ Authorization: `Bearer ${link.token}` });
+    expect(init.cache).toBe('no-store');
+  });
+
+  it('saves changes with a PUT conditioned on the revision', async () => {
+    const fetchImpl = okResponse({ success: true, data: { revision: 4 } });
+    await expect(updateDesign(link, 3, { width: 2 }, fetchImpl)).resolves.toEqual({ revision: 4 });
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe(`http://localhost:8000/api/designs/${link.designId}`);
+    expect(init.method).toBe('PUT');
+    expect(init.headers).toEqual({ 'Content-Type': 'application/json', Authorization: `Bearer ${link.token}`, 'If-Match': '"3"' });
+    expect(JSON.parse(init.body)).toEqual({ design: { width: 2 } });
+  });
+
+  it('encodes the design id into the path', async () => {
+    const fetchImpl = okResponse({ success: true, data: {} });
+    await loadDesign({ designId: '../catalog?x=1', token: link.token }, fetchImpl);
+    expect(fetchImpl.mock.calls[0][0]).toBe('http://localhost:8000/api/designs/..%2Fcatalog%3Fx%3D1');
   });
 });

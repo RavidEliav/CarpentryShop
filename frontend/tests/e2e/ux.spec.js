@@ -159,15 +159,20 @@ test.describe('door configurations render with hardware', () => {
   });
 });
 
-test.describe('save and render dialogs (backend phases not built yet)', () => {
-  test('Save opens a dialog that is honest about being unavailable, with no fake link', async ({ page }) => {
+test.describe('save and render dialogs', () => {
+  test('on a server that cannot save, the Save dialog says so and offers no link', async ({ page }) => {
+    await page.route('**/api/health', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { status: 'ok', env: 'e2e', agent: false, persistence: false } }),
+    }));
     await openDesigner(page);
     await page.getByTestId('open-save').click();
     const dialog = page.getByTestId('save-dialog');
     await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText('Saving is not available yet');
+    await expect(page.getByTestId('save-status')).toHaveText('Saving is not available on this server.');
     await expect(page.getByTestId('share-link')).toHaveValue('');
     await expect(page.getByTestId('save-confirm')).toBeDisabled();
+    await expect(page.getByTestId('copy-link')).toBeDisabled();
     await page.getByTestId('save-close').click();
     await expect(dialog).toBeHidden();
   });
