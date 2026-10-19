@@ -1,5 +1,17 @@
 # Supabase Projects
 
+**This copy of the project (RavidEliav):**
+
+| Environment | Project | Ref | Region |
+|---|---|---|---|
+| dev | banai-dev | `jtxnizqsssigalqbkbax` | eu-central-1 |
+
+- Organization: RavidEliav's Org (`lbksktpjbzpujcukeqnv`). The local CLI is linked to this project.
+- The `designs` migration is applied and verified live (2026-10-19): only `service_role` has `select, insert, update`; `anon` and `authenticated` get `42501 permission denied`. The security advisors report only the expected INFO `rls_enabled_no_policy`.
+- **Corporate networks:** if Postgres ports 5432/6543 are blocked, `supabase db push` and `supabase db query --linked` cannot connect. Apply migrations over HTTPS with the Management API instead (`POST https://api.supabase.com/v1/projects/<ref>/database/query`, bearer = a Supabase access token), and record each one in `supabase_migrations.schema_migrations` so a later `db push` skips it.
+
+**Upstream project (JonathanZouari/banai):**
+
 | Environment | Project | Ref | Region |
 |---|---|---|---|
 | dev | banai-dev | `lrulgstsqnxllknfvdpr` | eu-central-1 |

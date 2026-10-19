@@ -7,6 +7,8 @@ An MVP for designing standard straight wardrobes with three synchronized parts:
 
 All three edit **one canonical design state** through the same typed operations.
 
+> Based on [JonathanZouari/banai](https://github.com/JonathanZouari/banai) (full history kept). This copy adds Phase 7: designs saved in Supabase behind private share links.
+
 ![BanAI workspace](docs/screenshots/02-workspace.png)
 
 ## Table of contents
@@ -153,7 +155,7 @@ Playwright E2E tests never call OpenAI; the agent flows mock the `/api` edge.
 | 4 | UI and manual editing | Done |
 | 5 | AI designer agent | Merged |
 | 5+ | Voice (speech in, read-aloud out) | Done |
-| 7 | Persistence and private share links (Supabase) | Built and tested; the migration still has to be applied to each Supabase project |
+| 7 | Persistence and private share links (Supabase) | Done; live on Supabase project `banai-dev` (see `docs/supabase.md`) |
 | 8+ | AI photoreal render, deployment hardening | Planned |
 
 Render in the top bar opens a dialog that says rendering isn't available yet.
