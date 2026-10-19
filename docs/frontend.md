@@ -56,7 +56,9 @@ The visual design follows the Stitch design system documented in `/.stitch/DESIG
 | `chat/chatModel.js` | **Pure** chat view-model: messages, a pending proposal kept apart from the committed design, `proposalStatus` (pending or stale by revision), Cancel. Until Phase 5 a sent message gets a "not connected" reply and nothing is applied. |
 | `chat/chatPanel.js`, `chat/proposalCard.js` | DOM render of the model. The card lists structured changes with Confirm and Cancel, and turns stale (Confirm disabled) when the revision moves on. |
 | `entry/entryPoints.js`, `entry/startScreen.js` | The three entry points (guided, free text, basic wardrobe) in a modal start screen. All lead to the same editor. |
-| `share/saveDialog.js`, `render/renderDialog.js` | Save/share and render dialogs on the native `<dialog>`. Actions are disabled and say so until Phases 7 and 8. Render is labelled as illustrative. |
+| `share/saveDialog.js`, `render/renderDialog.js` | Save/share and render dialogs on the native `<dialog>`. Render stays disabled until Phase 8 and is labelled as illustrative. |
+| `share/persistence.js` | **Pure** save state (unit-tested): the private link, the server revision it was saved at, and `dirty` (the store moved on since). First save → `POST /api/designs`; later saves → `PUT` with `If-Match`; a 409 becomes `conflict`, resolved by "Save as a new link". |
+| `share/shareLink.js` | Parses and builds `#d=<uuid>.<token>`. Boot opens a valid link straight into the editor (no start screen); a bad link shows an error banner and the start screen. After a save, `history.replaceState` puts the link in the address bar, and pasting another link reloads into it. |
 | `ui/icons.js`, `ui/dialog.js`, `ui/logo.js`, `ui/ripple.js` | Inline SVG icons and logo (no icon font, image or CDN), a Material 3 dialog helper, and a delegated press ripple. |
 
 Styles follow Material Design 3 (`styles/tokens.css` holds the `--md-sys-*` tokens, with the older names kept as aliases). The design record is `/.stitch/DESIGN.md`.
