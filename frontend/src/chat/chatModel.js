@@ -2,6 +2,10 @@
 // without one, it gets an honest "not connected" reply. Either way nothing is ever applied to the
 // design from here: a proposal only changes the design after the customer confirms it.
 //
+// Once the chat changed the design (a confirmed proposal) or the customer said they are done, one
+// pinned note ({ kind: 'design' }) offers Generate Style Profile. It is replaced, never added, so
+// it never piles up.
+//
 // A proposal is { id, baseRevision, summary, changes: [{ title, detail }], signed? }. It is kept
 // apart from the committed design and is only ever "pending" or "stale" (the design changed after
 // it was made). `signed` is the server's signed payload, sent back unchanged on confirm.
@@ -49,6 +53,7 @@ export function fromServerProposal(signed, language = DEFAULT_LANGUAGE) {
 export function createChatModel({ getRevision, agent = null, getLanguage = () => DEFAULT_LANGUAGE }) {
   let nextId = 1;
   let proposal = null;
+  let built = null;
   let busy = false;
   const messages = [];
   const listeners = new Set();
@@ -74,9 +79,10 @@ export function createChatModel({ getRevision, agent = null, getLanguage = () =>
     busy = true;
     notify();
     try {
-      const { reply, replySignature, proposal: signed } = await agent({ messages: history(), language });
+      const { reply, replySignature, proposal: signed, offerProfile } = await agent({ messages: history(), language });
       push('assistant', reply, language, replySignature);
       if (signed) proposal = fromServerProposal(signed, language);
+      if (offerProfile === true) built = Object.freeze({ kind: 'design', language });
     } catch (error) {
       push('system', error?.message && error.status ? error.message : stringsFor(language).agentError, language);
     } finally {
@@ -92,6 +98,7 @@ export function createChatModel({ getRevision, agent = null, getLanguage = () =>
     },
     getMessages: () => [...messages],
     getProposal: () => proposal,
+    getBuilt: () => built,
     getProposalStatus: () => proposalStatus(proposal, getRevision()),
     isBusy: () => busy,
     isConnected: () => agent !== null,
@@ -130,6 +137,12 @@ export function createChatModel({ getRevision, agent = null, getLanguage = () =>
       push('system', t().cancelled);
       notify();
       return true;
+    },
+
+    /** The design changed through the chat (a confirmed proposal): offer the PDF step. */
+    noteDesignReady() {
+      built = Object.freeze({ kind: 'design', language: getLanguage() });
+      notify();
     },
 
     /** Called after the host applied (or refused) the proposal. */

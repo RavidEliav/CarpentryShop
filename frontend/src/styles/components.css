@@ -257,3 +257,7 @@
 .chat__read-aloud[aria-pressed="true"] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
 @keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 rgba(186, 26, 26, 0.45); } 80%, 100% { box-shadow: 0 0 0 10px rgba(186, 26, 26, 0); } }
 @media (prefers-reduced-motion: reduce) { .chat__mic--recording { animation: none; } }
+
+/* The pinned "design ready" note in the chat, with Generate Style Profile. */
+.chat__built-body { display: flex; flex-direction: column; gap: var(--space-2); }
+.chat__built .button-row { margin-top: 0; }

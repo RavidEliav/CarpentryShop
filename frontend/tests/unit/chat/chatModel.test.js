@@ -200,3 +200,17 @@ describe('messages keep their language', () => {
     expect(model.getMessages().at(-1)).toMatchObject({ role: 'system', language: 'en', text: STRINGS.en.cancelled });
   });
 });
+
+describe('the Generate Style Profile step', () => {
+  it('appears once the agent offers it or a change was confirmed, and never piles up', async () => {
+    const agent = vi.fn().mockResolvedValue({ reply: 'Great, download it.', offerProfile: true });
+    const model = createChatModel({ getRevision: () => 1, agent, getLanguage: () => 'he' });
+    expect(model.getBuilt()).toBeNull();
+    model.send('סיימתי');
+    await vi.waitFor(() => expect(model.isBusy()).toBe(false));
+    expect(model.getBuilt()).toEqual({ kind: 'design', language: 'he' });
+    model.noteDesignReady();
+    expect(model.getBuilt()).toEqual({ kind: 'design', language: 'he' });
+    expect(model.getMessages().map((m) => m.role)).toEqual(['user', 'assistant']);
+  });
+});

@@ -99,3 +99,40 @@ export const loadDesign = ({ designId, token }, fetchImpl = fetch) => request(de
 export const updateDesign = ({ designId, token }, revision, design, fetchImpl = fetch) => sendJson(
   'PUT', designPath(designId), { design }, fetchImpl, { Authorization: `Bearer ${token}`, 'If-Match': `"${revision}"` },
 );
+
+const SAFE_PDF_NAME = /^[A-Za-z0-9._-]{1,80}\.pdf$/;
+const FALLBACK_PDF_NAME = 'banai-wardrobe.pdf';
+
+function pdfFilename(disposition) {
+  const name = /filename="?([^";]+)"?/i.exec(disposition ?? '')?.[1];
+  return name && SAFE_PDF_NAME.test(name) ? name : FALLBACK_PDF_NAME;
+}
+
+/**
+ * The carpenter PDF: { design, language: 'he'|'en', image? } -> { blob, filename }. `image` is the
+ * app's own 3D snapshot (a JPEG/PNG data URL); without it the PDF uses its drawn illustration.
+ */
+export async function exportPdf({ design, language, image = null }, fetchImpl = fetch) {
+  if (!API_BASE_URL) throw new Error('The API base URL is not configured');
+  let response;
+  try {
+    response = await fetchImpl(`${API_BASE_URL}/api/export/pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(image ? { design, language, image } : { design, language }),
+    });
+  } catch {
+    throw new ApiError('Could not reach the design service.');
+  }
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new ApiError(body?.error?.message ?? `Request to /api/export/pdf failed with status ${response.status}`, {
+      status: response.status,
+      code: body?.error?.code ?? 'HTTP_ERROR',
+    });
+  }
+  if (!(response.headers?.get('Content-Type') ?? '').toLowerCase().startsWith('application/pdf')) {
+    throw new ApiError('The service did not return a PDF.', { status: response.status, code: 'BAD_RESPONSE' });
+  }
+  return { blob: await response.blob(), filename: pdfFilename(response.headers.get('Content-Disposition')) };
+}

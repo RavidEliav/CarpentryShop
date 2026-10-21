@@ -5,7 +5,7 @@ import { compartmentsSection } from './compartmentsSection.js';
 import { componentSection } from './componentSection.js';
 import { wardrobeSection } from './wardrobeSection.js';
 
-export function mountPanel(root, store) {
+export function mountPanel(root, store, { onExport } = {}) {
   const run = (ops) => {
     try {
       return store.dispatch(ops);
@@ -19,7 +19,7 @@ export function mountPanel(root, store) {
   const render = (state) => {
     if (state.design === rendered.design && state.selection === rendered.selection) return;
     rendered = { design: state.design, selection: state.selection };
-    const context = { design: state.design, catalog: state.catalog, selection: state.selection, run, select };
+    const context = { design: state.design, catalog: state.catalog, selection: state.selection, run, select, onExport };
     root.replaceChildren(
       ...(state.selection ? [componentSection(context)] : []),
       ...wardrobeSection(context),

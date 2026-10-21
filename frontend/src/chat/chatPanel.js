@@ -28,8 +28,10 @@ function languageSwitch(language, t) {
   return group;
 }
 
+/** onExport() opens the carpenter PDF dialog (Generate Style Profile); without it no note is shown. */
 export function mountChat(container, {
   model, onConfirm, language = createLanguage(), speaker = createSpeaker(), readAloud = readAloudPreference(),
+  onExport = null,
 }) {
   container.classList.add('panel--chat');
   let draft = '';
@@ -101,6 +103,23 @@ export function mountChat(container, {
     return button;
   }
 
+  /** The final step: one pinned note with Generate Style Profile (the carpenter PDF). */
+  function profileNote(code) {
+    const s = stringsFor(code);
+    const profile = el('button', { className: 'btn btn--primary', text: s.generateProfile, attrs: { type: 'button' } });
+    profile.dataset.testid = 'chat-export';
+    profile.addEventListener('click', () => onExport());
+    const note = el('div', { className: 'chat__bubble chat__bubble--system chat__built', attrs: { dir: s.dir, lang: code } }, [
+      icon('check', { size: 16 }),
+      el('div', { className: 'chat__built-body' }, [
+        el('span', { text: s.readyForProfile }),
+        el('div', { className: 'button-row' }, [profile]),
+      ]),
+    ]);
+    note.dataset.testid = 'profile-note';
+    return note;
+  }
+
   function build() {
     const t = language.strings();
     container.setAttribute('dir', t.dir);
@@ -150,6 +169,7 @@ export function mountChat(container, {
     ]);
     welcome.dataset.testid = 'chat-welcome';
 
+    const builtSlot = el('div', { className: 'chat__built-slot' });
     const list = el('div', { className: 'chat__messages', attrs: { role: 'log', 'aria-live': 'polite', 'aria-label': t.conversation } });
     list.dataset.testid = 'chat-messages';
     const proposalSlot = el('div', { className: 'chat__proposal' });
@@ -189,8 +209,8 @@ export function mountChat(container, {
 
     const controls = model.isConnected() ? [readAloudToggle(t), languageSwitch(language, t)] : [languageSwitch(language, t)];
     const footerRow = el('div', { className: 'chat__footer-row' }, [hint, el('div', { className: 'chat__footer-controls' }, controls)]);
-    container.replaceChildren(header, el('div', { className: 'chat__body' }, [welcome, list, proposalSlot]), el('div', { className: 'chat__footer' }, [composer, footerRow]));
-    view = { t, input, sendButton, composer, welcome, list, proposalSlot, typing, submit, hint, mic, renderedCount: 0, renderedProposalKey: null };
+    container.replaceChildren(header, el('div', { className: 'chat__body' }, [welcome, list, builtSlot, proposalSlot]), el('div', { className: 'chat__footer' }, [composer, footerRow]));
+    view = { t, input, sendButton, composer, welcome, list, proposalSlot, typing, submit, hint, mic, renderedCount: 0, renderedProposalKey: null, builtSlot, renderedBuiltKey: null };
     showVoiceState();
   }
 
@@ -207,7 +227,7 @@ export function mountChat(container, {
   function render() {
     const { t, sendButton, composer, welcome, list, proposalSlot, typing } = view;
     const messages = model.getMessages();
-    welcome.hidden = messages.length > 0 || model.getProposal() !== null;
+    welcome.hidden = messages.length > 0 || model.getProposal() !== null || model.getBuilt() !== null;
     list.hidden = messages.length === 0;
     // Only newly added bubbles are created (and animate in); existing ones stay untouched.
     if (messages.length < view.renderedCount) {
@@ -227,6 +247,13 @@ export function mountChat(container, {
       list.append(bubble);
     });
     view.renderedCount = messages.length;
+    // One pinned note offering the PDF step: replaced, never added, so it never piles up.
+    const built = model.getBuilt();
+    const builtKey = built && onExport ? built.language : '';
+    if (builtKey !== view.renderedBuiltKey) {
+      view.renderedBuiltKey = builtKey;
+      view.builtSlot.replaceChildren(...(builtKey ? [profileNote(built.language)] : []));
+    }
     const busy = model.isBusy();
     typing.hidden = !busy;
     if (busy) list.append(typing); // keep the indicator last, under the newest message

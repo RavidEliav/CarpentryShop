@@ -16,6 +16,7 @@ PROPOSE = "propose_changes"
 CLARIFY = "ask_clarification"
 ANSWER = "answer_design_question"
 DECLINE = "decline_off_topic"
+OFFER = "offer_style_profile"
 
 Text = lambda max_length: Annotated[str, Field(min_length=1, max_length=max_length, pattern=SAFE_TEXT_PATTERN)]  # noqa: E731
 
@@ -42,6 +43,11 @@ class ClarifyArgs(BaseModel):
 class AnswerArgs(BaseModel):
     model_config = ConfigDict(extra="ignore")
     answer: Text(600)
+
+
+class OfferArgs(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    reply: Text(300)
 
 
 TOOLS: list[dict] = [
@@ -95,6 +101,19 @@ TOOLS: list[dict] = [
                 "type": "object",
                 "properties": {"answer": {"type": "string", "description": "At most 2 short sentences, in the response language."}},
                 "required": ["answer"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": OFFER,
+            "description": "The customer is done or asks for the file for the carpenter / the PDF / the style profile. "
+                           "The app then shows its Generate Style Profile button; nothing in the design changes.",
+            "parameters": {
+                "type": "object",
+                "properties": {"reply": {"type": "string", "description": "One short sentence, in the response language."}},
+                "required": ["reply"],
             },
         },
     },

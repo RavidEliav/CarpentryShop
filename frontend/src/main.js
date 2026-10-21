@@ -9,6 +9,7 @@ import { applyProposal, getCatalog, getDefaultDesign, getHealth, loadDesign, sen
 import { createStore } from './state/store.js';
 import { mountPanel } from './editor/panel.js';
 import { createViewer } from './viewer/viewer.js';
+import { renderSnapshot } from './viewer/snapshot.js';
 import { createChatModel } from './chat/chatModel.js';
 import { createLanguage } from './chat/i18n.js';
 import { mountChat } from './chat/chatPanel.js';
@@ -16,6 +17,7 @@ import { mountStartScreen } from './entry/startScreen.js';
 import { createPersistence } from './share/persistence.js';
 import { createSaveDialog, saveIndicatorText } from './share/saveDialog.js';
 import { parseShareFragment, sameLink, shareFragment } from './share/shareLink.js';
+import { createExportDialog } from './export/exportDialog.js';
 import { createRenderDialog } from './render/renderDialog.js';
 import { createLogo } from './ui/logo.js';
 import { installRipple } from './ui/ripple.js';
@@ -97,7 +99,13 @@ async function boot() {
   const store = createStore({ design: (saved ?? initial).design, revision: initial.revision, catalog });
   const viewer = createViewer(document.getElementById('viewer'), store);
   bindInteriorToggle(store);
-  mountPanel(document.getElementById('properties-content'), store);
+  const language = createLanguage();
+  const exporter = createExportDialog({
+    getDesign: () => store.getState().design,
+    getLanguage: () => language.get(),
+    getSnapshot: (design) => renderSnapshot(design, store.getState().catalog),
+  });
+  mountPanel(document.getElementById('properties-content'), store, { onExport: exporter.open });
   bindDialogs();
   const persistence = createPersistence({ store, available: health?.data.persistence === true || saved !== null, saved });
   bindSaving(persistence);
@@ -109,7 +117,6 @@ async function boot() {
       return sendChat({ messages, design, revision, language: chatLanguage });
     }
     : null;
-  const language = createLanguage();
   const chatModel = createChatModel({ getRevision: () => store.getState().revision, agent, getLanguage: language.get });
   const t = () => language.strings();
 
@@ -126,13 +133,16 @@ async function boot() {
       const result = await applyProposal({ design, revision, proposal: proposal.signed, language: language.get() });
       store.replaceDesign(result.design, result.revision);
       chatModel.resolveProposal(t().applied);
+      chatModel.noteDesignReady(); // the final step: Generate Style Profile
     } catch (error) {
       chatModel.resolveProposal(error?.code === 'STALE' ? t().stale : t().notApplied);
     } finally {
       applying = false;
     }
   };
-  const chat = mountChat(document.getElementById('chat-panel'), { model: chatModel, onConfirm: confirmProposal, language });
+  const chat = mountChat(document.getElementById('chat-panel'), {
+    model: chatModel, onConfirm: confirmProposal, language, onExport: exporter.open,
+  });
   // A manual edit changes the revision, which may turn a pending proposal stale.
   store.subscribe(() => chat.refresh());
 

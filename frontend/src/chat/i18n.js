@@ -49,6 +49,8 @@ export const STRINGS = Object.freeze({
     applied: 'השינויים הוחלו. העיצוב שלך עודכן.',
     notApplied: 'לא ניתן היה להחיל את ההצעה. לא בוצע שום שינוי.',
     cancelled: 'ההצעה בוטלה. לא בוצע שום שינוי.',
+    readyForProfile: 'העיצוב שלך מוכן? אפשר להוריד את הקובץ לנגר.',
+    generateProfile: 'Generate Style Profile',
     composerHints: Object.freeze({
       guided: 'ספר לי על החלל: מה הרוחב והגובה של הארון?',
       freeText: 'לדוגמה: ארון ברוחב 240 ס"מ וגובה 260 ס"מ, לבן, עם שלושה תאים',
@@ -96,6 +98,8 @@ export const STRINGS = Object.freeze({
     applied: 'Applied. Your design has been updated.',
     notApplied: 'The proposal could not be applied. Nothing was changed.',
     cancelled: 'Proposal cancelled. No changes were made.',
+    readyForProfile: 'Is your design ready? Download the file for your carpenter.',
+    generateProfile: 'Generate Style Profile',
     composerHints: Object.freeze({
       guided: 'Tell me about the space: how wide and tall should the wardrobe be?',
       freeText: 'e.g. 240 cm wide, 260 cm tall, white, three compartments',

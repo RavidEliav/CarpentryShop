@@ -6,13 +6,18 @@ dependencies = [
     "fastapi>=0.143.1",
     "httpx2>=2.13.1",
     "openai>=3.31.0",
+    "pillow>=12.3.0",
     "pydantic>=2.14.1",
     "pydantic-settings>=2.16.0",
+    "python-bidi>=0.6.11",
+    "reportlab>=5.0.1",
     "uvicorn[standard]>=0.54.0",
 ]
 
 [dependency-groups]
 dev = [
+    "fonttools>=4.67.0",
+    "pypdf>=6.21.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
 ]

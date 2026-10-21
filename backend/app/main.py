@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import agent, designs, health, reference, voice
+from app.api import agent, designs, export, health, reference, voice
 from app.config import get_settings
 from app.persistence import repository_for
 
@@ -22,12 +22,14 @@ def create_app() -> FastAPI:
         allow_origins=settings.cors_origin_list,
         allow_methods=["GET", "POST", "PUT"],
         allow_headers=["Authorization", "Content-Type", "If-Match"],
+        expose_headers=["Content-Disposition"],  # the PDF export filename
     )
     app.include_router(health.router)
     app.include_router(reference.router)
     app.include_router(agent.router)
     app.include_router(voice.router)
     app.include_router(designs.router)
+    app.include_router(export.router)
     return app
 
 

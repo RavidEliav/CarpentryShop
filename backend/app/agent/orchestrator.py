@@ -17,7 +17,7 @@ from pydantic import ValidationError
 
 from app.agent.language import FALLBACK_REPLY, OFF_TOPIC_REPLY, Language, reply_language
 from app.agent.prompts import build_system_prompt
-from app.agent.tools import ANSWER, CLARIFY, DECLINE, PROPOSE, TOOLS, AnswerArgs, ClarifyArgs, ProposeArgs
+from app.agent.tools import ANSWER, CLARIFY, DECLINE, OFFER, PROPOSE, TOOLS, AnswerArgs, ClarifyArgs, OfferArgs, ProposeArgs
 from app.domain import ids
 from app.domain.apply import apply_ops
 from app.domain.errors import DomainError
@@ -43,6 +43,7 @@ _ID_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
 class TurnResult:
     reply: str
     proposal: dict | None = None
+    offer_profile: bool = False  # show the Generate Style Profile (carpenter PDF) step
 
 
 class AgentUnavailable(Exception):
@@ -130,6 +131,8 @@ def run_turn(*, client: Any, model: str, messages: list[dict], design: dict, rev
                 return TurnResult(reply=ClarifyArgs.model_validate(arguments).question)
             if call.function.name == ANSWER:
                 return TurnResult(reply=AnswerArgs.model_validate(arguments).answer)
+            if call.function.name == OFFER:
+                return TurnResult(reply=OfferArgs.model_validate(arguments).reply, offer_profile=True)
             if call.function.name != PROPOSE:
                 raise ValueError(f"unknown tool {call.function.name!r}")
             args = ProposeArgs.model_validate(arguments)

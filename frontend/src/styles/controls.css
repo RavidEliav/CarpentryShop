@@ -97,6 +97,9 @@ select.field__input {
 .btn--link { height: auto; padding: 0; border: 0; border-radius: 0; background: none; color: var(--md-sys-color-on-surface); font-weight: 500; text-align: left; white-space: nowrap; }
 .btn--link:hover:not(:disabled) { background: none; text-decoration: underline; }
 .button-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+/* Two actions side by side in the narrow properties panel (never wraps). */
+.button-row--pair { flex-wrap: nowrap; }
+.button-row--pair .btn { flex: 1 1 0; min-width: 0; padding: 0 var(--space-2); font-size: 13px; white-space: nowrap; }
 
 /* Switch: a native checkbox so labels and Playwright .check() keep working */
 .toggle { display: inline-flex; align-items: center; gap: var(--space-3); cursor: pointer; color: var(--md-sys-color-on-surface); font: var(--md-sys-typescale-label-large); }

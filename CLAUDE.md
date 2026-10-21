@@ -35,7 +35,10 @@ BanAI is an MVP AI wardrobe designer for standard straight wardrobes only. Three
   **Do not move to the next phase until the security review passes:** every CRITICAL and HIGH finding fixed and re-verified. Summarize the review result in the phase report.
 - **Phased delivery.** Work proceeds Phase 1 → 10 (`docs/architecture.md` §10a). After each phase, stop, report (what was implemented, files changed, real test output, known issues, next step), and wait for the user's approval. Never roll into the next phase on your own.
 - **Branches.** All work lands on `dev`, which Railway auto-deploys to the `dev` environment. Pushing or merging to `main` deploys **production** and needs explicit user approval.
-- **Excluded features (do not build):** pricing, quotes, orders, accounts or registration, dashboards, manufacturing/CNC export, feasibility rules, room design, image uploads, mobile-first layout, drag-and-drop geometry, and any AI change applied without approval. The app must never claim a design is manufacturable.
+- **Excluded features (do not build):** pricing, quotes, orders, accounts or registration, dashboards, manufacturing/CNC export (cut lists, machine files), feasibility rules, room design, image uploads, mobile-first layout, drag-and-drop geometry, and any AI change applied without approval. The app must never claim a design is manufacturable.
+  - **Approved exceptions (2026-10-16):**
+    - The **carpenter PDF** ("Generate Style Profile") is a design drawing that explains the intent. It is not a manufacturing export: no cut list, and construction details are left to the carpenter.
+    - The PDF's **3D snapshot** is not an image upload. The app renders it from the design (`viewer/snapshot.js`) and sends it with the export. The server treats it as untrusted bytes (`backend/app/export/image.py`): PNG/JPEG only, at most 2 MB and 2400 px, fully decoded, then re-encoded. It is never stored.
 - **Mandatory stack.**
   - Frontend: vanilla JS ES modules + Three.js, bundled with Vite. **No React, Vue, or R3F.**
   - Backend: FastAPI + Pydantic.
@@ -88,6 +91,12 @@ npm run build                                  # vite build -> dist/
   - `/api/voice/transcribe` turns speech into text. The text is sent as a normal `/api/chat` message.
   - `/api/voice/speech` reads replies aloud. It is opt-in and labelled as an AI voice.
   - Voice never applies a change by itself: it always ends in the same signed proposal and **Confirm**. OpenAI keys stay on the backend; there is no Realtime session in the browser.
+- **Carpenter PDF.**
+  - `POST /api/export/pdf` takes `{design, language}`. It validates the design with the domain engine and renders with reportlab (`backend/app/export/`).
+  - It stores nothing, involves no AI, and caps concurrent renders per worker (503 `BUSY`).
+  - The "Generate Style Profile" button sits next to "+ Add compartment". The chat also offers it in one pinned note after a confirmed proposal, or when the agent's `offer_style_profile` tool fires (the customer says they are done). That tool changes nothing in the design.
+  - Hebrew goes through `bidi.algorithm`, the pure-Python version, which mirrors brackets. Number expressions stay left to right.
+  - The fonts are merged Noto Sans + Noto Sans Hebrew (OFL) in `backend/app/export/fonts/`.
 - **Persistence.**
   - Only the backend talks to Supabase. The `designs` table has RLS enabled with no policies, and anon/authenticated grants are revoked.
   - Share link: `/#d=<uuid>.<token>`. The token is 256-bit, stored only as a SHA-256 hash, and compared in constant time.

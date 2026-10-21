@@ -123,7 +123,8 @@ def chat(
         return localized(502, "AGENT_ERROR", request.language)
     # The reply is signed so /api/voice/speech only reads aloud what this server said.
     reply_signature = signing.sign_reply(get_signing_key(), result.reply)
-    return {"success": True, "data": {"reply": result.reply, "replySignature": reply_signature, "proposal": result.proposal}}
+    return {"success": True, "data": {"reply": result.reply, "replySignature": reply_signature, "proposal": result.proposal,
+                                     "offerProfile": result.offer_profile}}
 
 
 @router.post("/proposals/apply")
