@@ -5,7 +5,7 @@ Project: **banai** (`59872a1e-192c-47f4-8b29-bb0bded6eb7e`), workspace "Jonathan
 | Environment | Branch | Service | Root dir | Start command | Healthcheck |
 |---|---|---|---|---|---|
 | `production` | `main` | backend | `/backend` | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` | `/api/health` |
-| `production` | `main` | frontend | `/frontend` | `npm start` (`serve -s dist`) | `/` |
+| `production` | `main` | frontend | `/frontend` | `npm start` (`serve dist`) | `/` |
 | `dev` | `dev` | backend | `/backend` | same | `/api/health` |
 | `dev` | `dev` | frontend | `/frontend` | same | `/` |
 

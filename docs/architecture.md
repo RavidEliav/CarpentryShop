@@ -131,7 +131,7 @@ Migration `supabase/migrations/<ts>_designs.sql`, created with `supabase migrati
   - dev: source `dev`, same root directories. Wired with `railway environment edit --json`.
 - Per-service `railway.json`:
   - backend: start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, healthcheck `/api/health`.
-  - frontend: `npm run build`, then `npx serve -s dist -l $PORT`.
+  - frontend: `npm run build`, then `npx serve dist -l $PORT` (no `-s`: the app routes by hash only, and `-s` would hide `accessibility.html`).
 - Per-environment variables, never shared:
   - backend: `OPENAI_API_KEY, OPENAI_CHAT_MODEL, OPENAI_IMAGE_MODEL, SUPABASE_URL, SUPABASE_SECRET_KEY, PROPOSAL_SIGNING_KEY, CORS_ORIGINS`
   - frontend: `VITE_API_BASE_URL=https://${{backend.RAILWAY_PUBLIC_DOMAIN}}`

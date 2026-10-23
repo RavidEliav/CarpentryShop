@@ -3,7 +3,7 @@
    design system "BanAI Material 3". See /.stitch/DESIGN.md. */
 :root {
   /* Color roles */
-  --md-sys-color-primary: #b4532a;
+  --md-sys-color-primary: #9c4520; /* AA: >= 4.5:1 as text on every light surface */
   --md-sys-color-on-primary: #ffffff;
   --md-sys-color-primary-container: #ffdbce;
   --md-sys-color-on-primary-container: #380d00;

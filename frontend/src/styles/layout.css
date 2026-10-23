@@ -81,3 +81,10 @@ body {
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
 }
+
+/* Accessibility statement page (accessibility.html) */
+body.statement { height: auto; min-height: 100vh; display: block; }
+.statement main { max-width: 760px; margin: 0 auto; padding: var(--space-6, 32px) 16px; line-height: 1.7; }
+.statement h1 { margin-top: 0; }
+.statement a { color: var(--md-sys-color-primary); }
+.statement__updated { color: var(--md-sys-color-on-surface-variant); }

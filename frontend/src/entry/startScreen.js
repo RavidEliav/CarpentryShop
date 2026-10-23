@@ -34,6 +34,7 @@ export function mountStartScreen({ onChoose }) {
       el('p', { className: 'start__subtitle', text: 'Choose how you would like to begin. You can switch between the AI designer and manual editing at any time.' }),
       el('div', { className: 'start__cards' }, cards),
       el('p', { className: 'start__footnote', text: START_FOOTNOTE }),
+      el('a', { className: 'start__footnote', text: 'הצהרת נגישות', attrs: { href: '/accessibility.html', lang: 'he' } }),
     ]),
   ]);
   dialog.dataset.testid = 'start-screen';

@@ -24,17 +24,23 @@ function inputField({ label, value, testId, suffix, commit, inputMode = 'decimal
   const input = el('input', { className: 'field__input', attrs: { id, type: 'text', inputmode: inputMode, autocomplete: 'off' } });
   input.value = value;
   if (testId) input.dataset.testid = testId;
-  const message = el('p', { className: 'field__message', attrs: { role: 'alert', 'aria-live': 'polite' } });
+  const message = el('p', { className: 'field__message', attrs: { id: `${id}-message`, role: 'alert' } });
+  input.setAttribute('aria-describedby', message.id);
   const showError = (text) => {
     message.textContent = text;
     input.setAttribute('aria-invalid', 'true');
+  };
+  const clearError = () => {
+    message.textContent = '';
+    input.removeAttribute('aria-invalid');
   };
   let lastSubmitted = value;
   const apply = () => {
     if (input.value === lastSubmitted) return;
     lastSubmitted = input.value;
     const result = commit(input.value);
-    if (!result.ok) showError(result.message ?? friendlyError(result.error));
+    if (result.ok) clearError();
+    else showError(result.message ?? friendlyError(result.error));
   };
   input.addEventListener('change', apply);
   input.addEventListener('keydown', (event) => {

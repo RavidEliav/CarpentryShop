@@ -44,7 +44,7 @@ select.field__input {
   text-overflow: ellipsis;
   cursor: pointer;
 }
-.field__input:focus { outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 1px var(--md-sys-color-primary); }
+.field__input:focus { outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 2px var(--md-sys-color-primary); }
 .btn:focus-visible,
 .swatch:focus-visible,
 .segmented__option:focus-visible,
@@ -171,3 +171,10 @@ select.field__input {
 .compartment-row .field__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .compartment-row:hover { background: rgba(35, 25, 23, 0.06); }
 .compartment-row.is-selected { background: var(--md-sys-color-secondary-container); box-shadow: inset 3px 0 0 var(--md-sys-color-primary); }
+
+/* Keyboard parts list and skip link (accessibility) */
+.parts-list { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+.parts-list .btn--link[aria-current="true"] { text-decoration: underline; font-weight: 700; }
+.skip-link { position: absolute; left: var(--space-3); top: -100px; z-index: 100; padding: var(--space-2) var(--space-3); border-radius: var(--md-sys-shape-medium); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.skip-link:focus { top: var(--space-2); outline: var(--focus-outline); outline-offset: 2px; }
+#properties-panel:focus { outline: none; }
