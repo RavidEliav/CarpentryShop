@@ -41,7 +41,6 @@ const sendJson = (method, path, payload, fetchImpl, headers = {}) => request(pat
   body: JSON.stringify(payload),
 });
 const postJson = (path, payload, fetchImpl) => sendJson('POST', path, payload, fetchImpl);
-const designPath = (designId) => `/api/designs/${encodeURIComponent(designId)}`;
 
 export const getHealth = (fetchImpl = fetch) => getJson('/api/health', fetchImpl).then((data) => ({ success: true, data }));
 
@@ -86,20 +85,6 @@ export async function fetchSpeech(payload, fetchImpl = fetch) {
 /** Apply a signed proposal: { design, revision, proposal } -> { design, revision }. 409 = stale. */
 export const applyProposal = (payload, fetchImpl = fetch) => postJson('/api/proposals/apply', payload, fetchImpl);
 
-/** Save a new design: -> { designId, accessToken, revision }. The token is only ever returned here. */
-export const createDesign = (design, fetchImpl = fetch) => postJson('/api/designs', { design }, fetchImpl);
-
-/** Open a saved design with its link: -> { design, revision }. 404 = wrong or unknown link. */
-export const loadDesign = ({ designId, token }, fetchImpl = fetch) => request(designPath(designId), fetchImpl, {
-  headers: { Authorization: `Bearer ${token}` },
-  cache: 'no-store',
-});
-
-/** Save changes made since `revision`: -> { revision }. 409 = it was changed elsewhere meanwhile. */
-export const updateDesign = ({ designId, token }, revision, design, fetchImpl = fetch) => sendJson(
-  'PUT', designPath(designId), { design }, fetchImpl, { Authorization: `Bearer ${token}`, 'If-Match': `"${revision}"` },
-);
-
 const SAFE_PDF_NAME = /^[A-Za-z0-9._-]{1,80}\.pdf$/;
 const FALLBACK_PDF_NAME = 'banai-wardrobe.pdf';
 
@@ -136,3 +121,21 @@ export async function exportPdf({ design, language, image = null }, fetchImpl = 
   }
   return { blob: await response.blob(), filename: pdfFilename(response.headers.get('Content-Disposition')) };
 }
+
+const designPath = (designId) => `/api/designs/${encodeURIComponent(designId)}`;
+const bearer = (token) => ({ Authorization: `Bearer ${token}` });
+
+/** Save a new design: { design, language } -> { designId, accessToken, revision }. The token is shown only once. */
+export const createSavedDesign = (payload, fetchImpl = fetch) => postJson('/api/designs', payload, fetchImpl);
+
+/** Reopen a saved design: { designId, token, language } -> { designId, name, design, revision }. 404 = not this link. */
+export const getSavedDesign = ({ designId, token, language }, fetchImpl = fetch) => request(
+  `${designPath(designId)}?language=${encodeURIComponent(language)}`,
+  fetchImpl,
+  { headers: bearer(token) },
+);
+
+/** Save over a saved design from `revision`: -> { designId, revision }. 409 STALE = someone saved in between. */
+export const updateSavedDesign = ({ designId, token, revision, design, language }, fetchImpl = fetch) => sendJson(
+  'PUT', designPath(designId), { design, language }, fetchImpl, { ...bearer(token), 'If-Match': String(revision) },
+);

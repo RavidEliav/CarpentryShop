@@ -7,8 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ASSUMPTION: a configurable default; override with OPENAI_CHAT_MODEL per environment.
 DEFAULT_CHAT_MODEL = "gpt-5.4-mini"
-# Without Supabase settings these environments save designs in memory (lost on restart).
-IN_MEMORY_PERSISTENCE_ENVS = frozenset({"local", "e2e"})
 
 
 class Settings(BaseSettings):
@@ -23,8 +21,13 @@ class Settings(BaseSettings):
     openai_transcribe_model: str = ""
     openai_tts_model: str = ""
     openai_tts_voice: str = ""
+    # Saved designs (Phase 7). Only the backend holds the secret key; the browser never talks to Supabase.
     supabase_url: str = ""
     supabase_secret_key: str = ""
+
+    @property
+    def storage_enabled(self) -> bool:
+        return bool(self.supabase_url.strip() and self.supabase_secret_key.strip())
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -37,14 +40,6 @@ class Settings(BaseSettings):
     @property
     def agent_enabled(self) -> bool:
         return bool(self.openai_api_key.strip())
-
-    @property
-    def supabase_configured(self) -> bool:
-        return bool(self.supabase_url.strip() and self.supabase_secret_key.strip())
-
-    @property
-    def persistence_enabled(self) -> bool:
-        return self.supabase_configured or self.app_env in IN_MEMORY_PERSISTENCE_ENVS
 
 
 @lru_cache

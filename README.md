@@ -7,8 +7,6 @@ An MVP for designing standard straight wardrobes with three synchronized parts:
 
 All three edit **one canonical design state** through the same typed operations.
 
-> Based on [JonathanZouari/banai](https://github.com/JonathanZouari/banai) (full history kept). This copy adds Phase 7: designs saved in Supabase behind private share links.
-
 ![BanAI workspace](docs/screenshots/02-workspace.png)
 
 ## Table of contents
@@ -41,10 +39,6 @@ All three edit **one canonical design state** through the same typed operations.
 - **Voice:**
   - Press the mic, speak in Hebrew or English, and press it again. Your words are transcribed and sent as a chat message, and the result is still a proposal you confirm.
   - Optionally, have replies **read aloud** in an AI-generated voice.
-- **Save and share:**
-  - **Save** stores the design in Supabase and gives you a private link (`/#d=<id>.<token>`). No account is needed.
-  - Opening the link, on any device, brings back the exact design. Later saves update the same link, and the top bar shows when there are unsaved changes.
-  - A save never overwrites changes made elsewhere in the meantime: you can keep your version under a new link instead.
 - **Design-only scope:** the agent declines anything that isn't about wardrobe design.
 
 ## Screenshots
@@ -112,7 +106,6 @@ npm run dev
 | `OPENAI_CHAT_MODEL` | Model to use, for example `gpt-4.1`. It has a configurable default. |
 | `OPENAI_TRANSCRIBE_MODEL` / `OPENAI_TTS_MODEL` / `OPENAI_TTS_VOICE` | Voice models and voice. Optional; the defaults are `gpt-4o-mini-transcribe`, `gpt-4o-mini-tts` and `marin`. |
 | `PROPOSAL_SIGNING_KEY` | HMAC key for proposals. Required outside `APP_ENV=local`. |
-| `SUPABASE_URL` / `SUPABASE_SECRET_KEY` | Where saved designs are stored (see `docs/supabase.md`). Without them, `local` and `e2e` save in memory, and other environments report saving as unavailable. |
 | `CORS_ORIGINS` | Allowed frontend origins, comma-separated. |
 | `APP_ENV` | Set to `local`, `dev` or `production`. API docs are disabled in production. |
 
@@ -155,10 +148,9 @@ Playwright E2E tests never call OpenAI; the agent flows mock the `/api` edge.
 | 4 | UI and manual editing | Done |
 | 5 | AI designer agent | Merged |
 | 5+ | Voice (speech in, read-aloud out) | Done |
-| 7 | Persistence and private share links (Supabase) | Done; live on Supabase project `banai-dev` (see `docs/supabase.md`) |
-| 8+ | AI photoreal render, deployment hardening | Planned |
+| 6+ | Persistence and share links, AI photoreal render, deployment hardening | Planned |
 
-Render in the top bar opens a dialog that says rendering isn't available yet.
+Save and Render in the top bar open dialogs that say those features aren't available yet.
 
 ## Documentation
 

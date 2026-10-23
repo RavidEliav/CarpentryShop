@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  ApiError, applyProposal, createDesign, exportPdf, getCatalog, getDefaultDesign, getHealth, loadDesign, sendChat, updateDesign,
+  ApiError, applyProposal, createSavedDesign, exportPdf, getCatalog, getDefaultDesign, getHealth, getSavedDesign, sendChat,
+  updateSavedDesign,
 } from '../../src/api/client.js';
 
 const okResponse = (body) => vi.fn().mockResolvedValue({ ok: true, json: async () => body });
@@ -50,45 +51,6 @@ describe('agent api', () => {
   });
 });
 
-describe('saved designs api', () => {
-  const link = { designId: '3f1c2b4a-1111-4222-8333-444455556666', token: 'x'.repeat(43) };
-
-  it('creates a design with a JSON POST', async () => {
-    const fetchImpl = okResponse({ success: true, data: { designId: link.designId, accessToken: link.token, revision: 1 } });
-    await expect(createDesign({ width: 1 }, fetchImpl)).resolves.toEqual({ designId: link.designId, accessToken: link.token, revision: 1 });
-    const [url, init] = fetchImpl.mock.calls[0];
-    expect(url).toBe('http://localhost:8000/api/designs');
-    expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body)).toEqual({ design: { width: 1 } });
-  });
-
-  it('opens a design with the token as a bearer key, never in the URL', async () => {
-    const fetchImpl = okResponse({ success: true, data: { design: {}, revision: 3 } });
-    await expect(loadDesign(link, fetchImpl)).resolves.toEqual({ design: {}, revision: 3 });
-    const [url, init] = fetchImpl.mock.calls[0];
-    expect(url).toBe(`http://localhost:8000/api/designs/${link.designId}`);
-    expect(url).not.toContain(link.token);
-    expect(init.headers).toEqual({ Authorization: `Bearer ${link.token}` });
-    expect(init.cache).toBe('no-store');
-  });
-
-  it('saves changes with a PUT conditioned on the revision', async () => {
-    const fetchImpl = okResponse({ success: true, data: { revision: 4 } });
-    await expect(updateDesign(link, 3, { width: 2 }, fetchImpl)).resolves.toEqual({ revision: 4 });
-    const [url, init] = fetchImpl.mock.calls[0];
-    expect(url).toBe(`http://localhost:8000/api/designs/${link.designId}`);
-    expect(init.method).toBe('PUT');
-    expect(init.headers).toEqual({ 'Content-Type': 'application/json', Authorization: `Bearer ${link.token}`, 'If-Match': '"3"' });
-    expect(JSON.parse(init.body)).toEqual({ design: { width: 2 } });
-  });
-
-  it('encodes the design id into the path', async () => {
-    const fetchImpl = okResponse({ success: true, data: {} });
-    await loadDesign({ designId: '../catalog?x=1', token: link.token }, fetchImpl);
-    expect(fetchImpl.mock.calls[0][0]).toBe('http://localhost:8000/api/designs/..%2Fcatalog%3Fx%3D1');
-  });
-});
-
 describe('exportPdf', () => {
   const pdfResponse = (headers) => vi.fn().mockResolvedValue({
     ok: true, status: 200, headers: new Headers(headers), blob: async () => new Blob(['%PDF-1.7']),
@@ -130,5 +92,41 @@ describe('exportPdf', () => {
 
   it('rejects a 200 that is not a PDF', async () => {
     await expect(exportPdf({}, pdfResponse({ 'Content-Type': 'text/html' }))).rejects.toMatchObject({ code: 'BAD_RESPONSE' });
+  });
+});
+
+describe('saved designs api', () => {
+  const designId = '0b6f2a52-3c1e-4c8e-9a51-1f6f3f2b7d10';
+
+  it('creates a saved design with a JSON POST', async () => {
+    const fetchImpl = okResponse({ success: true, data: { designId, accessToken: 't', revision: 1 } });
+    await expect(createSavedDesign({ design: {}, language: 'he' }, fetchImpl))
+      .resolves.toEqual({ designId, accessToken: 't', revision: 1 });
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe('http://localhost:8000/api/designs');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body)).toEqual({ design: {}, language: 'he' });
+  });
+
+  it('reopens with the token as a bearer header, never in the URL', async () => {
+    const fetchImpl = okResponse({ success: true, data: { designId, design: {}, revision: 3 } });
+    await getSavedDesign({ designId, token: 'secret', language: 'en' }, fetchImpl);
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe(`http://localhost:8000/api/designs/${designId}?language=en`);
+    expect(url).not.toContain('secret');
+    expect(init.headers).toEqual({ Authorization: 'Bearer secret' });
+  });
+
+  it('saves over a design with PUT and If-Match, and surfaces 409 STALE', async () => {
+    const stale = vi.fn().mockResolvedValue({
+      ok: false, status: 409, json: async () => ({ success: false, error: { code: 'STALE', message: 'saved elsewhere' } }),
+    });
+    const payload = { designId, token: 'secret', revision: 2, design: { a: 1 }, language: 'he' };
+    await expect(updateSavedDesign(payload, stale)).rejects.toMatchObject({ status: 409, code: 'STALE' });
+    const [url, init] = stale.mock.calls[0];
+    expect(url).toBe(`http://localhost:8000/api/designs/${designId}`);
+    expect(init.method).toBe('PUT');
+    expect(init.headers).toMatchObject({ Authorization: 'Bearer secret', 'If-Match': '2' });
+    expect(JSON.parse(init.body)).toEqual({ design: { a: 1 }, language: 'he' });
   });
 });

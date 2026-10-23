@@ -32,7 +32,6 @@ body {
   font: var(--md-sys-typescale-label-medium);
   font-variant-numeric: tabular-nums;
 }
-.topbar__save { font: var(--md-sys-typescale-label-medium); color: var(--md-sys-color-on-surface-variant); }
 
 .banner { padding: var(--space-2) var(--space-4); font: var(--md-sys-typescale-body-medium); }
 .banner--error { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }

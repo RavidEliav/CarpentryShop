@@ -7,6 +7,8 @@ const WEB_PORT = 5183;
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: false,
+  workers: 1, // WebGL (SwiftShader) is CPU-heavy: parallel workers time out on a busy machine
+
   retries: 0,
   reporter: [['list']],
   use: {
@@ -26,10 +28,8 @@ export default defineConfig({
       cwd: '../backend',
       url: `http://localhost:${API_PORT}/api/health`,
       // No keys: E2E never calls OpenAI or Supabase (it would read backend/.env otherwise). Agent tests
-      // mock /api; saved designs go to the backend's in-memory store (APP_ENV=e2e).
-      env: {
-        APP_ENV: 'e2e', CORS_ORIGINS: `http://localhost:${WEB_PORT}`, OPENAI_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '',
-      },
+      // mock /api; saved designs use the backend's in-memory store.
+      env: { APP_ENV: 'e2e', CORS_ORIGINS: `http://localhost:${WEB_PORT}`, OPENAI_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '' },
       reuseExistingServer: false,
       timeout: 60_000,
     },

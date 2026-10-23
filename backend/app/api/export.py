@@ -45,12 +45,12 @@ class ExportRequest(BaseModel):
     image: Annotated[str, Field(max_length=2_700_000)] | None = None  # data:image/(png|jpeg);base64,...
 
 
-async def _read_capped(request: Request) -> bytes | None:
-    """The body, or None once it passes MAX_BODY_BYTES (stops reading early)."""
+async def read_capped(request: Request, limit: int = MAX_BODY_BYTES) -> bytes | None:
+    """The body, or None once it passes `limit` bytes (stops reading early)."""
     chunks, size = [], 0
     async for chunk in request.stream():
         size += len(chunk)
-        if size > MAX_BODY_BYTES:
+        if size > limit:
             return None
         chunks.append(chunk)
     return b"".join(chunks)
@@ -63,7 +63,7 @@ def _build(design: dict, catalog: dict, language: str, image: str | None) -> byt
 
 @router.post("/export/pdf")
 async def export_pdf(request: Request):
-    body = await _read_capped(request)
+    body = await read_capped(request)
     if body is None:
         return error(413, "TOO_LARGE", MESSAGES["TOO_LARGE"]["he"])
     try:

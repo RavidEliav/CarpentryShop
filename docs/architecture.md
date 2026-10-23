@@ -123,13 +123,6 @@ Migration `supabase/migrations/<ts>_designs.sql`, created with `supabase migrati
 - Saves use `UPDATE … WHERE id=$1 AND revision=$2`, which gives optimistic concurrency. Every save is validated by the domain layer before it is written.
 - Run `supabase db advisors` after the migration. The migration is applied to both banai-dev and banai-prod via `supabase link` + `supabase db push`.
 
-**As built (Phase 7, 2026-10-19):** see `docs/supabase.md`. Differences from the plan above:
-- `token_hash` is hex `text` with a check constraint instead of `bytea` (simpler over the Data API, same security).
-- There is no separate `POST /api/designs/validate`: create and save both run full domain validation and return the domain error (422).
-- A wrong token returns the same 404 as an unknown id; a missing or malformed `Authorization` is 401; a missing `If-Match` is 428.
-- DoS limits: request bodies are capped at 256 KB, and new designs at 30 per minute per server process.
-- Without Supabase settings, `local` and `e2e` use an in-memory store; any other environment reports saving as unavailable.
-
 ## 8. Railway topology (follows the `railway-provision` skill, adapted)
 - Project `banai` in workspace "Jonathan Zouari's Projects".
 - Environments: `production` (the default) and `dev` (`railway environment new dev --duplicate production`).
