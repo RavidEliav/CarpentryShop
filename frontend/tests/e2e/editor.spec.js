@@ -80,3 +80,22 @@ test.describe('Phase 4: manual editing', () => {
     expect((await state(page)).selection).toBeNull();
   });
 });
+
+test('the added catalog material and colours reach the editor, the 3D view and the PDF request', async ({ page }) => {
+  await openDesigner(page);
+  const material = page.getByLabel('Material').first();
+  await expect(material.locator('option[value="birch_plywood"]')).toHaveText('Birch plywood');
+  await material.selectOption('birch_plywood');
+  for (const [name, hex] of [['Navy blue', '2b3a52'], ['Sand beige', 'd9c8ad'], ['Sage green', '8f9e83']]) {
+    await page.getByRole('button', { name, exact: true }).first().click();
+    await expect.poll(() => page.evaluate(() => window.__banai.viewer.meshOf('carcass').material.color.getHexString())).toBe(hex);
+  }
+
+  await page.getByTestId('open-export').click();
+  const request = page.waitForRequest('**/api/export/pdf');
+  await page.getByTestId('export-download').click();
+  const { design } = (await request).postDataJSON();
+  expect(design.carcass.appearance.material).toEqual({ catalogId: 'birch_plywood' });
+  expect(design.carcass.appearance.color).toEqual({ catalogId: 'sage_green' });
+  await page.waitForEvent('download');
+});

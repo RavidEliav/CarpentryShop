@@ -9,6 +9,7 @@ from app.api import export
 from app.domain.apply import apply_ops
 from app.domain.catalog import load_catalog
 from app.export.pdf import render_pdf
+from app.export.strings import CATALOG_NAMES
 from app.main import app
 from tests.domain.conftest import load_design
 
@@ -128,3 +129,24 @@ def test_worst_case_design_renders_quickly():
     pdf = render_pdf(design, catalog, "he", date(2026, 10, 16))
     assert time.perf_counter() - started < 5
     assert len(PdfReader(io.BytesIO(pdf)).pages) > 20  # detail sheets + paginated component list
+
+
+def test_every_catalog_entry_has_a_hebrew_name():
+    catalog = load_catalog()
+    ids = {entry["id"] for section in catalog.values() for entry in section}
+    assert ids - CATALOG_NAMES["he"].keys() == set()
+
+
+def test_added_catalog_colours_and_material_appear_in_the_pdf():
+    design = apply_ops(load_design("basic"), [
+        {"op": "set_material", "target": "carcass", "material": {"catalogId": "birch_plywood"},
+         "color": {"catalogId": "sage_green"}},
+        {"op": "set_material", "target": "doors", "color": {"catalogId": "navy_blue"}},
+        {"op": "set_material", "target": "shf_l1", "color": {"catalogId": "sand_beige"}},
+    ], load_catalog())
+    english = text_of(render_pdf(design, load_catalog(), "en", date(2026, 10, 23)))
+    for name in ("Birch plywood", "Sage green", "Navy blue", "Sand beige"):
+        assert name in english, name
+    hebrew = text_of(render_pdf(design, load_catalog(), "he", date(2026, 10, 23)))
+    for name in ("דיקט ליבנה", "ירוק מרווה", "כחול נייבי", "בז' חול"):
+        assert name in hebrew, name
