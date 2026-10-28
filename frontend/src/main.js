@@ -9,6 +9,7 @@ import {
   applyProposal, createSavedDesign, getCatalog, getDefaultDesign, getHealth, getSavedDesign, sendChat, updateSavedDesign,
 } from './api/client.js';
 import { createStore } from './state/store.js';
+import { browserStorage, clearDraft, draftToOffer, formatDraftTime, readDraft, watchDraft } from './state/draft.js';
 import { mountPanel } from './editor/panel.js';
 import { createViewer } from './viewer/viewer.js';
 import { renderSnapshot } from './viewer/snapshot.js';
@@ -16,6 +17,7 @@ import { createChatModel } from './chat/chatModel.js';
 import { createLanguage } from './chat/i18n.js';
 import { mountChat } from './chat/chatPanel.js';
 import { mountStartScreen } from './entry/startScreen.js';
+import { openDraftDialog } from './entry/draftPrompt.js';
 import { createSaveDialog } from './share/saveDialog.js';
 import { parseShareHash, shareHash } from './share/link.js';
 import { createExportDialog } from './export/exportDialog.js';
@@ -63,7 +65,7 @@ async function loadInitial(language) {
   return { initial: await getDefaultDesign(), session: null };
 }
 
-function createSaver(store, language, initialSession) {
+function createSaver(store, language, initialSession, onSaved) {
   let session = initialSession;
   return async () => {
     const { design } = store.getState();
@@ -75,6 +77,7 @@ function createSaver(store, language, initialSession) {
       session = { designId: created.designId, token: created.accessToken, revision: created.revision };
     }
     window.history.replaceState(null, '', shareHash(session));
+    onSaved(session);
     return window.location.href;
   };
 }
@@ -118,6 +121,13 @@ async function boot() {
   }
   // Validates the server data before anything is rendered (throws on invalid data).
   const store = createStore({ design: initial.design, revision: initial.revision, catalog });
+  // A draft from an earlier visit to this same design (or to a new, unsaved one), if it differs.
+  let designId = session?.designId ?? null;
+  const storage = browserStorage();
+  const offer = draftToOffer(readDraft(storage, store.getState().catalog), {
+    designId, loadedDesign: store.getState().design,
+  });
+  const draft = watchDraft(store, { storage, getDesignId: () => designId });
   const viewer = createViewer(document.getElementById('viewer'), store);
   bindInteriorToggle(store);
   bindSkipLink();
@@ -129,7 +139,10 @@ async function boot() {
   mountPanel(document.getElementById('properties-content'), store, { onExport: exporter.open });
   bindDialogs({
     storage: health?.data.storage === true,
-    onSave: createSaver(store, language, session),
+    onSave: createSaver(store, language, session, (saved) => {
+      designId = saved.designId; // the draft now belongs to this link
+      draft.sync();
+    }),
     link: session ? window.location.href : '',
   });
 
@@ -175,11 +188,29 @@ async function boot() {
     window.__banai = Object.freeze({ store, viewer, chat: chatModel });
   }
 
-  if (session) {
-    tour.startIfNew(); // reopened from a link: straight into the editor
+  const restoreDraft = () => {
+    store.replaceDesign(offer.design, store.getState().revision + 1);
+    document.getElementById('properties-panel').focus();
+    tour.startIfNew();
+  };
+  const draftChoice = offer && {
+    time: formatDraftTime(offer.savedAt),
+    onRestore: restoreDraft,
+    onDiscard: () => clearDraft(storage),
+  };
+
+  if (session) { // reopened from a link: straight into the editor
+    // The tour waits for the draft question, so two modals never stack.
+    if (draftChoice) {
+      const prompt = openDraftDialog({ ...draftChoice, onDiscard: () => { draftChoice.onDiscard(); tour.startIfNew(); } });
+      prompt.element.addEventListener('close', () => tour.startIfNew()); // also Esc or the scrim
+    } else {
+      tour.startIfNew();
+    }
     return;
   }
   mountStartScreen({
+    draft: draftChoice,
     onChoose: (entry) => {
       // All three entry points open the same editor; the chat ones focus the composer, the manual
       // one the properties panel, so keyboard focus never falls out of the page when the modal closes.
