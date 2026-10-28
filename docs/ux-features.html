@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BanAI שיפורי UX</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --text: #1d1d1f; --muted: #5f6064;
+    --line: #e2e0da; --accent: #8a5a32; --easy: #2e7d4f; --mid: #b26a00; --hard: #b3261e;
+    --code-bg: #efede7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161617; --card: #222224; --text: #f2f1ed; --muted: #a5a5aa;
+      --line: #36363a; --accent: #d9a877; --easy: #6fcf97; --mid: #f2b45a; --hard: #f28b82;
+      --code-bg: #2c2c2f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161617; --card: #222224; --text: #f2f1ed; --muted: #a5a5aa;
+    --line: #36363a; --accent: #d9a877; --easy: #6fcf97; --mid: #f2b45a; --hard: #f28b82;
+    --code-bg: #2c2c2f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 1.35rem; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+  code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: .88em; direction: ltr; unicode-bidi: embed; overflow-wrap: anywhere; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
+  .filters button {
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; font: inherit;
+  }
+  .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .card h3 { margin: 0; font-size: 1.1rem; }
+  .card p { margin: 0; }
+  .num { color: var(--accent); font-weight: 700; margin-inline-end: 6px; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: .82rem; }
+  .tag { border: 1px solid currentColor; border-radius: 999px; padding: 0 10px; }
+  .lvl-easy { color: var(--easy); } .lvl-mid { color: var(--mid); }
+  .area { color: var(--muted); }
+  .card ul { margin: 0; padding-inline-start: 20px; }
+  .label { font-weight: 600; font-size: .9rem; margin-top: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BanAI: 15 שיפורי חוויית משתמש</h1>
+  <p class="lead">פיצ'רים קטנים שלא דורשים שינוי בארכיטקטורה ומשפרים את התחושה של המוצר. הם לא חוזרים על הרשימה ב־<code>student-features.html</code>. כל כרטיס מציין את הקבצים הרלוונטיים ומתי הפיצ'ר נחשב גמור.</p>
+
+  <div class="filters" role="group" aria-label="סינון לפי רמה">
+    <button type="button" data-filter="all" aria-pressed="true">הכל</button>
+    <button type="button" data-filter="easy" aria-pressed="false">קל</button>
+    <button type="button" data-filter="mid" aria-pressed="false">בינוני</button>
+  </div>
+
+  <h2>פיצ'רים</h2>
+  <div class="grid">
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">1</span>שמירת טיוטה אוטומטית</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">state</span></div>
+      <p>כל שינוי בעיצוב נשמר ב־<code>localStorage</code>. אחרי רענון מופיעה הודעה: "נמצאה טיוטה מ־14:32. לשחזר?". המשתמש לא מאבד עבודה בגלל סגירה של הלשונית בטעות.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/state/store.js</code> (subscribe)</li><li><code>frontend/src/main.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הטיוטה עוברת <code>validateDesign</code> לפני שחזור. טיוטה פגומה נמחקת בשקט.</li><li>הכל עטוף ב־try/catch ועובד גם במצב גלישה פרטית.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">2</span>אזהרה לפני יציאה עם שינויים שלא נשמרו</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">share</span></div>
+      <p>אם יש שינויים מאז השמירה האחרונה לקישור, הדפדפן שואל לפני סגירה (<code>beforeunload</code>). כפתור השמירה מקבל נקודה קטנה של "לא נשמר".</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/share/saveDialog.js</code></li><li><code>frontend/src/main.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>אין אזהרה מיד אחרי שמירה, ויש אזהרה אחרי כל שינוי (ידני או הצעת AI שאושרה).</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3><span class="num">3</span>"העיצובים האחרונים שלי" במסך הפתיחה</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">entry · share</span></div>
+      <p>הקישורים הפרטיים שנשמרו נשמרים מקומית בדפדפן (עד 5) ומוצגים במסך הפתיחה, עם תאריך ומידות. אין חשבונות: הרשימה קיימת רק במכשיר הזה.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/entry/startScreen.js</code></li><li><code>frontend/src/share/link.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>יש כפתור "הסר מהרשימה".</li><li>קישור שכבר לא קיים (404) מציג הודעה ידידותית ונמחק מהרשימה.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">4</span>כפתורי הצעה מהירה בצ'אט</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">chat</span></div>
+      <p>מעל שדה ההקלדה יופיעו 3 עד 4 "צ'יפים", למשל "הוסף מגירות", "הגדל ל־2.5 מטר" ו"דלתות הזזה". לחיצה שולחת הודעה רגילה. זה מוריד את מחסום "מה בכלל אפשר לבקש?".</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/chat/chatPanel.js</code></li><li><code>frontend/src/chat/i18n.js</code> (טקסטים לכל שפה)</li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הצ'יפ עובר באותו מסלול של <code>/api/chat</code> ומסתיים בהצעה ובכפתור אישור.</li><li>נגיש במקלדת.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3><span class="num">5</span>"מה ישתנה" בכרטיס ההצעה</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">chat · domain</span></div>
+      <p>לפני האישור, כרטיס ההצעה מציג רשימה קצרה כמו "רוחב: 200 ← 240 ס"מ" או "+2 מדפים בתא האמצעי". ההשוואה מחושבת בין העיצוב הנוכחי לבין <code>applyOps</code> על עותק שלו.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/chat/proposalCard.js</code></li><li><code>frontend/src/domain/apply.js</code> (קריאה בלבד)</li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>העיצוב השמור לא משתנה עד שלוחצים "אישור".</li><li>בדיקת יחידה ל־diff של שינוי מידות ושל הוספת רכיב.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">6</span>Tooltip בריחוף בתלת־ממד</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">viewer</span></div>
+      <p>כשהעכבר עובר מעל מדף, מגירה או תא, מופיעה תווית קטנה כמו "מדף · גובה 80 ס"מ". ה־hook <code>onHover</code> כבר קיים ב־<code>picking.js</code>, והטקסט מגיע מ־<code>describeSelection</code>.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/viewer.js</code>, <code>picking.js</code>, <code>format.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>התווית לא מסתירה את הסמן ונעלמת כשהעכבר יוצא מהקנבס.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3><span class="num">7</span>מצלמה שמתמקדת ברכיב שנבחר</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">viewer</span></div>
+      <p>בחירת תא (בעורך או בלחיצה בתלת־ממד) מזיזה את ה־target של <code>OrbitControls</code> למרכז התא, במעבר חלק. לחיצה כפולה על רקע ריק מחזירה למבט הכללי.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/viewer.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>המעבר מכבד את <code>prefers-reduced-motion</code> (קפיצה מיידית).</li><li>המצלמה לא נכנסת ל־state של העיצוב.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">8</span>מצב "סיבוב תצוגה"</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">viewer</span></div>
+      <p>כפתור שמפעיל סיבוב איטי של הארון (<code>controls.autoRotate</code>). הסיבוב נעצר מעצמו כשהמשתמש נוגע בתצוגה. זה מראה את העיצוב יפה בהצגה ללקוח.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/viewer.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הכפתור כבוי כברירת מחדל ומוסתר כש־<code>prefers-reduced-motion</code> פעיל.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">9</span>הורדת תמונת PNG של הארון</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">viewer · export</span></div>
+      <p>כפתור "שמור תמונה" שמשתמש ב־<code>renderSnapshot</code> הקיים (אותה תמונה שנכנסת ל־PDF) ומוריד אותה כקובץ. זה נוח לשליחה בוואטסאפ לבן או בת הזוג.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/snapshot.js</code></li><li><code>frontend/src/export/exportDialog.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הקובץ נוצר כולו בדפדפן ושום דבר לא נשלח לשרת.</li><li>שם הקובץ כולל את המידות, למשל <code>banai-200x240x60.png</code>.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">10</span>כפתור "שתף" מובנה</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">share</span></div>
+      <p>בדיאלוג השמירה, מתחת ל"העתק קישור", מופיע כפתור שמפעיל את <code>navigator.share</code> (תפריט השיתוף של המערכת). בדפדפן שלא תומך בזה, הכפתור פשוט לא מוצג.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/share/saveDialog.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>ביטול של תפריט השיתוף (<code>AbortError</code>) לא מציג שגיאה.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">11</span>הודעות Toast קצרות</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">ui</span></div>
+      <p>רכיב אחד ב־<code>ui/</code> שמציג הודעה קצרה בפינה: "השינוי הוחל", "הקישור הועתק", "ה־PDF מוכן". ההודעה נעלמת אחרי 3 שניות. היום חלק מהפעולות מסתיימות בלי משוב גלוי.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/ui/toast.js</code> (חדש)</li><li><code>frontend/src/styles/components.css</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>האזור מסומן <code>aria-live="polite"</code> וקורא המסך מקריא את ההודעה.</li><li>ריחוף עם העכבר עוצר את הטיימר.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">12</span>מתג בהיר / כהה</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">ui · styles</span></div>
+      <p>כפתור בכותרת שמחליף את <code>data-theme</code> על <code>&lt;html&gt;</code> ושומר את הבחירה. ברירת המחדל עוקבת אחרי הגדרת המערכת. אפשר גם להתאים את רקע הסצנה בתלת־ממד.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/styles/tokens.css</code></li><li><code>frontend/src/viewer/viewer.js</code> (צבע רקע)</li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הניגודיות עומדת ב־WCAG AA בשני המצבים, כמו בהצהרת הנגישות.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3><span class="num">13</span>מידות נפוצות בלחיצה</h3>
+      <div class="meta"><span class="tag lvl-easy">קל</span><span class="area">editor</span></div>
+      <p>ליד שדות הרוחב, הגובה והעומק יופיעו צ'יפים של ערכים נפוצים (למשל 150, 200 ו־250 ס"מ ברוחב). לחיצה מפעילה את אותה פעולת <code>update_dimensions</code> כמו הקלדה.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/editor/wardrobeSection.js</code>, <code>fields.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הערכים מוגדרים במקום אחד ומתויגים כברירות מחדל ולא ככללים עסקיים.</li><li>ערך שאינו חוקי לעיצוב הנוכחי מוצג מושבת.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3><span class="num">14</span>תבניות פתיחה נוספות</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">domain · entry</span></div>
+      <p>חוץ מ"ארון בסיסי", יהיו 2 או 3 תבניות כמו "ארון ילדים 150 ס"מ", "ארון זוגי עם דלתות הזזה" ו"ארון מינימליסטי". כל תבנית היא רשימת ops כמו <code>BASIC_WARDROBE_OPS</code>.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/domain/presets.js</code></li><li><code>frontend/src/entry/entryPoints.js</code>, <code>startScreen.js</code></li><li><code>backend/app/domain/defaults.py</code> (מראה)</li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>כל תבנית עוברת <code>validateDesign</code> בבדיקות, גם ב־vitest וגם ב־pytest.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3><span class="num">15</span>סיור היכרות בביקור הראשון</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">ui · entry</span></div>
+      <p>3 בועות הסבר: "כאן מדברים עם המעצב", "כאן עורכים ידנית", "כאן מסובבים את הארון". הסיור מופיע פעם אחת ונשמר ב־<code>localStorage</code>. כפתור "?" בכותרת מפעיל אותו מחדש.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/ui/tour.js</code> (חדש), שימוש ב־<code>createDialog</code> לפי הצורך</li><li><code>frontend/src/entry/startScreen.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>Esc סוגר את הסיור, הפוקוס חוזר לדף, ויש כפתור "דלג".</li><li>הטקסטים קיימים בכל השפות שב־<code>i18n.js</code>.</li></ul>
+    </article>
+
+  </div>
+
+</main>
+<script>
+  const buttons = document.querySelectorAll('.filters button');
+  const cards = document.querySelectorAll('.card');
+  buttons.forEach((btn) => btn.addEventListener('click', () => {
+    const level = btn.dataset.filter;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    cards.forEach((c) => { c.hidden = level !== 'all' && c.dataset.level !== level; });
+  }));
+</script>
+</body>
+</html>

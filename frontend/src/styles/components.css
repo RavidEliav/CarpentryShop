@@ -179,6 +179,64 @@
 .entry-card__text { flex: 1; margin: 0 0 var(--space-3); color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-medium); }
 .entry-card .btn { align-self: stretch; }
 
+/* Introduction tour: a full-window transparent <dialog>; the ring's huge shadow dims all but the target. */
+.tour {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.tour::backdrop { background: transparent; }
+.tour__ring {
+  position: fixed;
+  border: 3px solid var(--md-sys-color-primary);
+  border-radius: var(--md-sys-shape-large);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transition: left 260ms ease, top 260ms ease, width 260ms ease, height 260ms ease;
+}
+.tour__bubble {
+  position: fixed;
+  width: min(340px, calc(100vw - 32px));
+  padding: var(--space-5);
+  border-radius: var(--md-sys-shape-large);
+  background: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-3);
+  text-align: start;
+  animation: pop-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+/* The pointer: a rotated square on the edge that faces the target. */
+.tour__bubble::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.tour__bubble[data-side="right"]::before { left: -7px; top: calc(var(--tour-arrow) - 7px); }
+.tour__bubble[data-side="left"]::before { right: -7px; top: calc(var(--tour-arrow) - 7px); }
+.tour__bubble[data-side="bottom"]::before { top: -7px; left: calc(var(--tour-arrow) - 7px); }
+.tour__bubble[data-side="top"]::before { bottom: -7px; left: calc(var(--tour-arrow) - 7px); }
+.tour__bubble[data-side="inside"]::before { display: none; }
+.tour__progress { margin: 0 0 var(--space-1); color: var(--md-sys-color-primary); font: var(--md-sys-typescale-label-medium); }
+.tour__title { margin: 0 0 var(--space-2); font: var(--md-sys-typescale-title-medium); font-size: 18px; }
+.tour__body { margin: 0; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-body-medium); }
+.tour__actions { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-5); }
+.tour__spacer { flex: 1; }
+.tour__actions [hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tour__ring { transition: none; }
+}
+
 /* Logo */
 .logo { display: inline-flex; align-items: center; gap: 10px; }
 .logo__mark { flex: none; filter: drop-shadow(0 3px 6px rgba(180, 83, 42, 0.3)); transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1.4); }

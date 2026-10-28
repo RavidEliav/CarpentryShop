@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BanAI פיצ'רים לסטודנטים</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --text: #1d1d1f; --muted: #5f6064;
+    --line: #e2e0da; --accent: #8a5a32; --easy: #2e7d4f; --mid: #b26a00; --hard: #b3261e;
+    --code-bg: #efede7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161617; --card: #222224; --text: #f2f1ed; --muted: #a5a5aa;
+      --line: #36363a; --accent: #d9a877; --easy: #6fcf97; --mid: #f2b45a; --hard: #f28b82;
+      --code-bg: #2c2c2f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161617; --card: #222224; --text: #f2f1ed; --muted: #a5a5aa;
+    --line: #36363a; --accent: #d9a877; --easy: #6fcf97; --mid: #f2b45a; --hard: #f28b82;
+    --code-bg: #2c2c2f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 1.35rem; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+  code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: .88em; direction: ltr; unicode-bidi: embed; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
+  .filters button {
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; font: inherit;
+  }
+  .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .card h3 { margin: 0; font-size: 1.1rem; }
+  .card p { margin: 0; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: .82rem; }
+  .tag { border: 1px solid currentColor; border-radius: 999px; padding: 0 10px; }
+  .lvl-easy { color: var(--easy); } .lvl-mid { color: var(--mid); } .lvl-hard { color: var(--hard); }
+  .area { color: var(--muted); }
+  .card ul { margin: 0; padding-inline-start: 20px; }
+  .label { font-weight: 600; font-size: .9rem; margin-top: 4px; }
+  .rules { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 24px; }
+  .rules li { margin-bottom: 6px; }
+  .no { color: var(--hard); font-weight: 600; }
+  pre {
+    background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto;
+    direction: ltr; text-align: left; font-size: .88rem; margin: 0;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>BanAI: פיצ'רים שאפשר להוסיף</h1>
+  <p class="lead">רשימת משימות לסטודנטים, מסודרת לפי רמת קושי. כל כרטיס מציין את הקבצים הרלוונטיים ואת הקריטריון ל"גמור". לפני שמתחילים, קראו את <a href="#rules">כללי הברזל</a>.</p>
+
+  <div class="filters" role="group" aria-label="סינון לפי רמה">
+    <button type="button" data-filter="all" aria-pressed="true">הכל</button>
+    <button type="button" data-filter="easy" aria-pressed="false">מתחילים</button>
+    <button type="button" data-filter="mid" aria-pressed="false">בינוני</button>
+    <button type="button" data-filter="hard" aria-pressed="false">מתקדם</button>
+  </div>
+
+  <h2>פיצ'רים</h2>
+  <div class="grid">
+
+    <article class="card" data-level="easy">
+      <h3>צבעים וחומרים חדשים בקטלוג</h3>
+      <div class="meta"><span class="tag lvl-easy">מתחילים</span><span class="area">קטלוג · עורך</span></div>
+      <p>להוסיף 3 צבעים וחומר אחד לקטלוג, ולוודא שהם מופיעים בעורך, בתלת־ממד וב־PDF.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>backend/app/domain/catalog.json</code></li><li><code>frontend/src/viewer/materials.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הצבע נבחר בעורך והארון משנה צבע בתלת־ממד.</li><li>הסוכן מכיר את הצבע החדש ("תצבע בירוק זית").</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3>כפתורי זווית מצלמה</h3>
+      <div class="meta"><span class="tag lvl-easy">מתחילים</span><span class="area">תלת־ממד</span></div>
+      <p>כפתורים "חזית", "צד", "3/4" ו"איפוס" שמזיזים את המצלמה במעבר חלק.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/viewer.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>המעבר חלק ומכבד <code>prefers-reduced-motion</code>.</li><li>המצלמה לא משנה את מצב העיצוב (state).</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3>החלפת יחידות תצוגה (ס"מ / מ"מ / אינץ')</h3>
+      <div class="meta"><span class="tag lvl-easy">מתחילים</span><span class="area">עורך · תלת־ממד</span></div>
+      <p>בורר יחידות שמשנה רק את התצוגה. העיצוב עצמו נשאר תמיד במילימטרים שלמים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/units.js</code>, <code>format.js</code></li><li><code>frontend/src/editor/fields.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הקלדה באינץ' נשמרת כמ"מ שלמים.</li><li>בדיקת יחידה להמרה הלוך־חזור.</li></ul>
+    </article>
+
+    <article class="card" data-level="easy">
+      <h3>קיצורי מקלדת</h3>
+      <div class="meta"><span class="tag lvl-easy">מתחילים</span><span class="area">עורך · נגישות</span></div>
+      <p><code>Delete</code> מוחק את הרכיב הנבחר, <code>Esc</code> מבטל בחירה, ו־<code>?</code> מציג חלון עם כל הקיצורים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/main.js</code></li><li><code>frontend/src/state/store.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>המחיקה עוברת דרך הפעולה <code>remove_component</code>, לא דרך עריכה ישירה.</li><li>הקיצורים לא פועלים כשהמשתמש מקליד בשדה טקסט.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3>ביטול / ביצוע מחדש (Undo / Redo)</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">state</span></div>
+      <p>היסטוריית שינויים ב־store עם <code>Ctrl+Z</code> / <code>Ctrl+Y</code> וכפתורים בממשק. זה עובד גם על הצעות AI שאושרו.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/state/store.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>ההיסטוריה שומרת עיצובים בלתי־משתנים (immutable) ומוגבלת ל־50 צעדים.</li><li>אחרי Undo, השמירה ל־Supabase עדיין עובדת עם ה־revision הנכון.</li><li>יש בדיקות vitest.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3>פאנל סיכום עיצוב</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">domain · UI</span></div>
+      <p>כרטיס שמציג כמה תאים, מדפים, מגירות ומוטות יש, את הנפח הפנימי (ליטרים) ואת אורך התלייה הכולל.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/domain/geometry.js</code> (פונקציה טהורה חדשה)</li><li><code>frontend/src/editor/panel.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הסיכום מתעדכן מיד אחרי כל שינוי, ידני או AI.</li><li><span class="no">בלי מחירים</span>, ובלי לטעון שהארון ניתן לייצור.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3>אנימציית פתיחת דלתות</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">תלת־ממד</span></div>
+      <p>מתג "דלתות פתוחות/סגורות" שמסובב את הדלתות על הצירים כדי לראות את הפנים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/builders/doors.js</code></li><li><code>frontend/src/viewer/viewer.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>מצב הדלת הוא מצב תצוגה בלבד ולא נכנס ל־design.</li><li>בחירת מדף (picking) עובדת כשהדלתות פתוחות.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3>שפה שלישית: ערבית</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">i18n · PDF · סוכן</span></div>
+      <p>להוסיף <code>ar</code> לממשק, לצ'אט ולפרופיל הסגנון ב־PDF, כולל כיווניות RTL.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/chat/i18n.js</code></li><li><code>backend/app/export/strings.py</code> + פונטים</li><li><code>backend/app/agent/language.py</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>ה־PDF בערבית נקרא נכון, ומספרים נשארים משמאל לימין.</li><li>הסוכן עונה בערבית כשכותבים לו בערבית.</li></ul>
+    </article>
+
+    <article class="card" data-level="mid">
+      <h3>שכפול עיצוב לקישור חדש</h3>
+      <div class="meta"><span class="tag lvl-mid">בינוני</span><span class="area">persistence</span></div>
+      <p>כפתור "שמור כעותק" שיוצר עיצוב חדש עם קישור ו־token חדשים, בלי לגעת במקור.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/share/saveDialog.js</code></li><li><code>backend/app/api/designs.py</code> (שימוש ב־<code>create_design</code> הקיים)</li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הקישור הישן ממשיך לפתוח את המקור.</li><li>יש בדיקת pytest ובדיקת Playwright.</li></ul>
+    </article>
+
+    <article class="card" data-level="hard">
+      <h3>פעולה חדשה: <code>mirror_layout</code></h3>
+      <div class="meta"><span class="tag lvl-hard">מתקדם</span><span class="area">ops engine · parity</span></div>
+      <p>היפוך סדר התאים משמאל לימין. ה־IDs נשמרים, וה־partitions מתהפכים בהתאם.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>backend/app/domain/ops_structure.py</code></li><li><code>frontend/src/domain/opsStructure.js</code></li><li><code>shared/fixtures/ops/layout.json</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>אותם fixtures עוברים גם ב־pytest וגם ב־vitest.</li><li>אינווריאנט הרוחב נשמר.</li><li>הסוכן יכול להציע את הפעולה ("תהפוך את הסידור").</li></ul>
+    </article>
+
+    <article class="card" data-level="hard">
+      <h3>פעולה חדשה: <code>copy_compartment</code></h3>
+      <div class="meta"><span class="tag lvl-hard">מתקדם</span><span class="area">ops engine · parity</span></div>
+      <p>העתקת התוכן הפנימי של תא (מדפים, מגירות, מוטות) לתא אחר, עם IDs חדשים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>backend/app/domain/ops_items.py</code>, <code>ids.py</code></li><li><code>frontend/src/domain/opsItems.js</code>, <code>ids.js</code></li><li><code>shared/fixtures/ops/items.json</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>פריטים שלא נכנסים לתא היעד (רוחב או גובה) גורמים לשגיאה ברורה, לא לחיתוך שקט.</li><li>יש fixtures ל־parity.</li></ul>
+    </article>
+
+    <article class="card" data-level="hard">
+      <h3>כלי מדידה בתלת־ממד</h3>
+      <div class="meta"><span class="tag lvl-hard">מתקדם</span><span class="area">תלת־ממד · picking</span></div>
+      <p>לוחצים על שני רכיבים ורואים את המרחק האנכי ביניהם, למשל רווח בין מדפים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>frontend/src/viewer/picking.js</code>, <code>dimensions.js</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>המדידה מחושבת מה־state, לא מה־mesh.</li><li>אין גרירה שמשנה גאומטריה (drag-and-drop אסור).</li></ul>
+    </article>
+
+    <article class="card" data-level="hard">
+      <h3>כלי סוכן: "הסבר את העיצוב"</h3>
+      <div class="meta"><span class="tag lvl-hard">מתקדם</span><span class="area">AI agent</span></div>
+      <p>כשהמשתמש שואל "מה יש לי בארון?", הסוכן מחזיר תיאור מילולי בלי להציע שינויים.</p>
+      <div class="label">קבצים</div>
+      <ul><li><code>backend/app/agent/tools.py</code>, <code>orchestrator.py</code>, <code>prompts.py</code></li></ul>
+      <div class="label">גמור כש…</div>
+      <ul><li>הכלי לא מחזיר ops ולא משנה את העיצוב.</li><li>יש בדיקת pytest עם OpenAI מדומה (mock).</li></ul>
+    </article>
+
+  </div>
+
+  <h2 id="rules">כללי הברזל</h2>
+  <div class="rules">
+    <ul>
+      <li><strong>מצב אחד.</strong> כל שינוי בעיצוב הוא רשימת ops טהורים, <code>(design) → newDesign</code>, בלי מוטציה. התלת־ממד רק מצייר מה־state.</li>
+      <li><strong>Parity.</strong> אם משנים op בצד אחד, משנים אותו גם בצד השני ומוסיפים fixture ב־<code>shared/fixtures/ops/</code>.</li>
+      <li><strong>AI תמיד דרך אישור.</strong> הסוכן מציע הצעה חתומה, והמשתמש לוחץ Confirm. אין שינוי אוטומטי.</li>
+      <li><strong>יחידות.</strong> כל האורכים במילימטרים שלמים.</li>
+      <li><strong>Stack.</strong> Vanilla JS + Three.js, ו־FastAPI + Pydantic. <span class="no">בלי React או Vue.</span></li>
+      <li><span class="no">אסור לבנות:</span> מחירים או הצעות מחיר, הזמנות, חשבונות משתמש, דשבורדים, ייצוא CNC או רשימות חיתוך, עיצוב חדר, העלאת תמונות, ו־drag-and-drop של גאומטריה. האפליקציה אף פעם לא טוענת שעיצוב ניתן לייצור.</li>
+      <li><strong>Git.</strong> עובדים על branch משלכם (<code>feature/&lt;שם&gt;</code>) ופותחים PR ל־<code>dev</code>. לא נוגעים ב־<code>main</code>.</li>
+    </ul>
+  </div>
+
+  <h2>לפני PR: כל הבדיקות ירוקות</h2>
+<pre># backend/
+uv run pytest
+
+# frontend/
+npm test
+npx playwright test
+npm run build
+npm audit</pre>
+</main>
+<script>
+  const buttons = document.querySelectorAll('.filters button');
+  const cards = document.querySelectorAll('.card');
+  buttons.forEach((btn) => btn.addEventListener('click', () => {
+    const level = btn.dataset.filter;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    cards.forEach((c) => { c.hidden = level !== 'all' && c.dataset.level !== level; });
+  }));
+</script>
+</body>
+</html>

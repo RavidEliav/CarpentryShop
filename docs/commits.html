@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BanAI Commits</title>
+<style>
+  :root { --bg:#f6f5f1; --card:#fff; --text:#1d1d1f; --muted:#5f6064; --line:#e2e0da; --accent:#8a5a32; --code:#efede7;
+          --dev:#1f5fa8; --main:#2e7d4f; --merge:#6b4fa0; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#18181a; --card:#222225; --text:#ececec; --muted:#a3a3a8; --line:#36363a;
+          --accent:#e0a878; --code:#2c2c30; --dev:#7fb2ee; --main:#7fd0a0; --merge:#c0a8ee; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, "Segoe UI", Arial, sans-serif; }
+  main { max-width:1200px; margin:0 auto; padding:32px 16px; }
+  h1 { margin:0 0 4px; } .sub { color:var(--muted); margin:0 0 24px; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:24px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px; min-width:150px; }
+  .stat b { display:block; font-size:22px; } .stat span { color:var(--muted); font-size:13px; }
+  .wrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:start; vertical-align:top; }
+  th { position:sticky; top:0; background:var(--card); font-size:13px; color:var(--muted); }
+  tr:last-child td { border-bottom:0; }
+  code { font:13px ui-monospace, Consolas, monospace; background:var(--code); border-radius:6px; padding:1px 6px; }
+  .short { font-weight:700; color:var(--accent); margin-inline-end:6px; }
+  .full { display:block; margin-top:4px; font-size:11px; color:var(--muted); background:none; padding:0; word-break:break-all; }
+  .n { color:var(--muted); } .nowrap { white-space:nowrap; } .msg { text-align:left; }
+  .b { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:1px 8px; border:1px solid currentColor; margin:1px; white-space:nowrap; }
+  .dev { color:var(--dev); } .main { color:var(--main); } .merge { color:var(--merge); }
+  .head { color:var(--text); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Commits: dev ו־main</h1>
+  <p class="sub">כל ה־commits בשני הענפים, מהחדש לישן. נוצר מ־git המקומי.</p>
+  <div class="stats">
+    <div class="stat"><b>37</b><span>commits סה"כ</span></div>
+    <div class="stat"><b dir="ltr"><code>8fc092d</code></b><span>HEAD של dev</span></div>
+    <div class="stat"><b dir="ltr"><code>8fc092d</code></b><span>HEAD של main</span></div>
+    <div class="stat"><b>0 / 0</b><span>רק ב־dev / רק ב־main</span></div>
+  </div>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>#</th><th>Hash</th><th>תאריך</th><th>מחבר</th><th>הודעה</th><th>ענפים</th></tr></thead>
+      <tbody>
+<tr><td class="n">37</td><td dir="ltr"><code class="short">8fc092d</code><code class="full">8fc092dd2374251aba5d93dad31940f1ce563728</code></td><td dir="ltr" class="nowrap">2026-10-23 10:09</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">fix(a11y): keep keyboard focus in the page after the start screen closes</td><td><span class="b dev">dev</span> <span class="b main">main</span> <span class="b head">HEAD dev</span> <span class="b head">HEAD main</span></td></tr>
+<tr><td class="n">36</td><td dir="ltr"><code class="short">3dce8d2</code><code class="full">3dce8d223f7a7c0ead9426d9ffaa5edd46b48b82</code></td><td dir="ltr" class="nowrap">2026-10-23 10:02</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">fix(frontend): serve the accessibility statement in production</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">35</td><td dir="ltr"><code class="short">fd5b146</code><code class="full">fd5b146456e88f1c9d27406d3e778c84a9bf056f</code></td><td dir="ltr" class="nowrap">2026-10-23 09:53</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(a11y): keyboard access, WCAG AA fixes and accessibility statement (IS 5568)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">34</td><td dir="ltr"><code class="short">ae2c0f2</code><code class="full">ae2c0f2f6638327714a7c1af459952edf0823ad2</code></td><td dir="ltr" class="nowrap">2026-10-23 08:42</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(persistence): save and reopen designs via a private link (Supabase)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">33</td><td dir="ltr"><code class="short">2acc64d</code><code class="full">2acc64dd24abb6649bb98ab5565ea2352c58da35</code></td><td dir="ltr" class="nowrap">2026-10-21 18:27</td><td>Jonathan Zouari</td><td dir="ltr" class="msg"><span class="b merge">merge</span> Merge pull request #23 from JinwooCode/feature/carpenter-pdf</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">32</td><td dir="ltr"><code class="short">280e1c1</code><code class="full">280e1c13475434635e7adc331598fd2032d0eb3e</code></td><td dir="ltr" class="nowrap">2026-10-21 17:42</td><td>Jinwoo Code</td><td dir="ltr" class="msg">feat(export): carpenter style-profile PDF (Hebrew/English) with 3D snapshot</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">31</td><td dir="ltr"><code class="short">a93762a</code><code class="full">a93762a63aeb8df5db577ebf5385fcb8d4ba282c</code></td><td dir="ltr" class="nowrap">2026-10-16 13:05</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(voice): better Hebrew speech in and out</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">30</td><td dir="ltr"><code class="short">1f22eeb</code><code class="full">1f22eeb267c1331d52e6b192ac03175b34d5260d</code></td><td dir="ltr" class="nowrap">2026-10-16 12:57</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(voice): talk to the AI designer and hear replies (chained STT -&gt; agent -&gt; TTS)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">29</td><td dir="ltr"><code class="short">b8c7869</code><code class="full">b8c7869569f28cf6b10f62e9f30897efb1902ef4</code></td><td dir="ltr" class="nowrap">2026-10-16 12:41</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: README with table of contents and app screenshots</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">28</td><td dir="ltr"><code class="short">290a673</code><code class="full">290a6736d2c05b22796709b03982c7c22f66b12b</code></td><td dir="ltr" class="nowrap">2026-10-16 12:38</td><td>Jonathan Zouari</td><td dir="ltr" class="msg"><span class="b merge">merge</span> Merge pull request #5 from JinwooCode/feature/new-changes</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">27</td><td dir="ltr"><code class="short">b2eea48</code><code class="full">b2eea488c4088ec289f4c38877880eb682a81110</code></td><td dir="ltr" class="nowrap">2026-10-16 12:25</td><td>Jinwoo Code</td><td dir="ltr" class="msg">feat(chat): connect the AI designer chat, with a Hebrew/English switch</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">26</td><td dir="ltr"><code class="short">86c5506</code><code class="full">86c55064e493a4d7a43b31665b25910587593dc2</code></td><td dir="ltr" class="nowrap">2026-10-16 12:25</td><td>Jinwoo Code</td><td dir="ltr" class="msg">feat(agent): OpenAI design agent with signed proposals (Phase 5)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">25</td><td dir="ltr"><code class="short">34d140a</code><code class="full">34d140ab29ef0fb2383ecfe954a6de2c0b25a687</code></td><td dir="ltr" class="nowrap">2026-10-16 11:15</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">fix: restore python in the Obsidian Stop hook (python3 is a Store stub on Windows)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">24</td><td dir="ltr"><code class="short">883fc96</code><code class="full">883fc96f7cbd0f0e385edd3e6c597ac4fda837c0</code></td><td dir="ltr" class="nowrap">2026-10-16 11:15</td><td>Jonathan Zouari</td><td dir="ltr" class="msg"><span class="b merge">merge</span> Merge pull request #3 from shirashef-jpg/feature/ux-ui</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">23</td><td dir="ltr"><code class="short">d734cfa</code><code class="full">d734cfa50a9502da9ed886d59fbbbb0eb85c4db1</code></td><td dir="ltr" class="nowrap">2026-10-16 10:59</td><td>Shira Shefer</td><td dir="ltr" class="msg">feat(ui): new type pair, BanAI logo, inviting AI panel, dropdown padding and micro-interactions</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">22</td><td dir="ltr"><code class="short">e0bc5ef</code><code class="full">e0bc5efe10ddcf4229dd6fd8a5faf440f85cac02</code></td><td dir="ltr" class="nowrap">2026-10-16 10:59</td><td>Shira Shefer</td><td dir="ltr" class="msg">feat(viewer): realistic door hardware and sliding doors; fix flaky picking after a rebuild</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">21</td><td dir="ltr"><code class="short">c453ad0</code><code class="full">c453ad038b46d542f16b00e8e615a1f0bc8fde52</code></td><td dir="ltr" class="nowrap">2026-10-16 10:34</td><td>Shira Shefer</td><td dir="ltr" class="msg">feat(ui): AI chat panel with proposal card, start screen, save and render dialogs</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">20</td><td dir="ltr"><code class="short">862dc3b</code><code class="full">862dc3b4be84eb408f8a51c6267f83263bb73cd3</code></td><td dir="ltr" class="nowrap">2026-10-16 10:34</td><td>Shira Shefer</td><td dir="ltr" class="msg">feat(ui): Material Design 3 tokens and restyled controls (Roboto, terracotta seed)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">19</td><td dir="ltr"><code class="short">7533fff</code><code class="full">7533fff4e151567fe59bc3d1990ae22cd6f422ca</code></td><td dir="ltr" class="nowrap">2026-10-16 10:34</td><td>Shira Shefer</td><td dir="ltr" class="msg">chore: run the Obsidian work-log hook with python3</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">18</td><td dir="ltr"><code class="short">3ae87eb</code><code class="full">3ae87eb75fbfd607fea13a5d0d9f0e27c498e7d6</code></td><td dir="ltr" class="nowrap">2026-10-14 22:07</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">chore: remove superseded stylesheet</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">17</td><td dir="ltr"><code class="short">5dc4c15</code><code class="full">5dc4c15d6c1c66dfefabb5e09ea5a5577bfc688f</code></td><td dir="ltr" class="nowrap">2026-10-14 22:07</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">test: catalog names obey safe-text rules; docs: editor architecture</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">16</td><td dir="ltr"><code class="short">b8828e5</code><code class="full">b8828e59bbcbb3127d9b3259e0fb09ee0c0e044e</code></td><td dir="ltr" class="nowrap">2026-10-14 22:07</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(editor): manual properties editor driven by domain ops</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">15</td><td dir="ltr"><code class="short">7df2f87</code><code class="full">7df2f877e91e8ca454e99b9a79b42fbc0efe1c04</code></td><td dir="ltr" class="nowrap">2026-10-14 22:07</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(ui): Stitch &#x27;Nordic Atelier&#x27; design system, 3-column workspace, self-hosted Inter</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">14</td><td dir="ltr"><code class="short">cea707b</code><code class="full">cea707b56a1752e4396404033db08c0d1ab372b7</code></td><td dir="ltr" class="nowrap">2026-10-14 21:54</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: frontend architecture (store, viewer, testing)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">13</td><td dir="ltr"><code class="short">434ee64</code><code class="full">434ee6445e76e5d9e3bea68c767953eaa3c8bcdf</code></td><td dir="ltr" class="nowrap">2026-10-14 21:54</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(viewer): parametric Three.js wardrobe viewer with selection and dimensions</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">12</td><td dir="ltr"><code class="short">3ce0a28</code><code class="full">3ce0a287781d4443bf301d5ca194d6a22d787898</code></td><td dir="ltr" class="nowrap">2026-10-14 21:54</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(state): validated observable store over the domain engine</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">11</td><td dir="ltr"><code class="short">1a9a109</code><code class="full">1a9a1090f8c9c40c893ccd0bff53e6806d9cd585</code></td><td dir="ltr" class="nowrap">2026-10-14 21:54</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(api): read-only catalog and default-design endpoints; hide docs in production</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">10</td><td dir="ltr"><code class="short">084b404</code><code class="full">084b404975dcae475a250c13cbb10da88035f1c5</code></td><td dir="ltr" class="nowrap">2026-10-14 21:30</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: document canonical schema, op protocol and input hardening</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">9</td><td dir="ltr"><code class="short">f24cbd8</code><code class="full">f24cbd89b5cbaabdf881bc60e347996c208a84a9</code></td><td dir="ltr" class="nowrap">2026-10-14 21:30</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(domain): JS mirror of the domain engine with parity tests</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">8</td><td dir="ltr"><code class="short">f7a12a5</code><code class="full">f7a12a587b22f5f8076644e31f8159a73fe65aff</code></td><td dir="ltr" class="nowrap">2026-10-14 21:30</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">feat(domain): canonical wardrobe schema and op engine (Python)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">7</td><td dir="ltr"><code class="short">4ebd8c4</code><code class="full">4ebd8c4d2b12ef9bf4463e6e38c60583b50ff791</code></td><td dir="ltr" class="nowrap">2026-10-14 21:30</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">test: add shared golden fixtures for the domain op protocol</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">6</td><td dir="ltr"><code class="short">51edcda</code><code class="full">51edcda75f506be44701926c8a3abb4cd58004f5</code></td><td dir="ltr" class="nowrap">2026-10-14 21:30</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: add test, E2E and security-review gates to CLAUDE.md</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">5</td><td dir="ltr"><code class="short">e35cdbd</code><code class="full">e35cdbd0e18c805c806aededfd8f9db999053779</code></td><td dir="ltr" class="nowrap">2026-10-14 20:50</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: require planning before execution in CLAUDE.md</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">4</td><td dir="ltr"><code class="short">5ac674b</code><code class="full">5ac674b20bfd3d2316e3f543ac4ef1e315c68a7f</code></td><td dir="ltr" class="nowrap">2026-10-14 20:48</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">docs: add CLAUDE.md</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">3</td><td dir="ltr"><code class="short">8d83a48</code><code class="full">8d83a4886bb63710a3dd984833544f3e983b9505</code></td><td dir="ltr" class="nowrap">2026-10-14 20:47</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">chore: add Obsidian work-log Stop hook</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">2</td><td dir="ltr"><code class="short">f6868e1</code><code class="full">f6868e172fcab284f988173ac69460a3a48ea897</code></td><td dir="ltr" class="nowrap">2026-10-14 20:38</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">chore: add Supabase CLI config and infra docs</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+<tr><td class="n">1</td><td dir="ltr"><code class="short">7033087</code><code class="full">703308798f8a5f822501bed2a7fb830b1479d36f</code></td><td dir="ltr" class="nowrap">2026-10-14 20:33</td><td>Jonathan Zouari</td><td dir="ltr" class="msg">chore: project foundations (FastAPI + Vite/Three.js skeletons, docs)</td><td><span class="b dev">dev</span> <span class="b main">main</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

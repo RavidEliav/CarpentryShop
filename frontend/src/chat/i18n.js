@@ -55,6 +55,28 @@ export const STRINGS = Object.freeze({
       guided: 'ספר לי על החלל: מה הרוחב והגובה של הארון?',
       freeText: 'לדוגמה: ארון ברוחב 240 ס"מ וגובה 260 ס"מ, לבן, עם שלושה תאים',
     }),
+    tour: Object.freeze({
+      replay: 'סיור היכרות',
+      progress: (n, total) => `${n} מתוך ${total}`,
+      next: 'הבא',
+      back: 'הקודם',
+      skip: 'דלג',
+      done: 'סיום',
+      steps: Object.freeze({
+        chat: Object.freeze({
+          title: 'כאן מדברים עם המעצב',
+          body: 'תאר במילים שלך מה אתה רוצה, והמעצב יציע שינויים. שום דבר לא משתנה עד שתלחץ "אישור".',
+        }),
+        editor: Object.freeze({
+          title: 'כאן עורכים ידנית',
+          body: 'שנה מידות, תאים, מדפים, מגירות וחומרים. כל שינוי מופיע מיד בתלת־ממד.',
+        }),
+        viewer: Object.freeze({
+          title: 'כאן מסובבים את הארון',
+          body: 'גרור כדי לסובב, גלול כדי להתקרב, ולחץ על חלק כדי לבחור אותו.',
+        }),
+      }),
+    }),
   }),
   en: Object.freeze({
     dir: 'ltr',
@@ -103,6 +125,28 @@ export const STRINGS = Object.freeze({
     composerHints: Object.freeze({
       guided: 'Tell me about the space: how wide and tall should the wardrobe be?',
       freeText: 'e.g. 240 cm wide, 260 cm tall, white, three compartments',
+    }),
+    tour: Object.freeze({
+      replay: 'Take the tour',
+      progress: (n, total) => `${n} of ${total}`,
+      next: 'Next',
+      back: 'Back',
+      skip: 'Skip',
+      done: 'Done',
+      steps: Object.freeze({
+        chat: Object.freeze({
+          title: 'Talk to the designer here',
+          body: 'Describe what you want in your own words and the designer proposes changes. Nothing changes until you press Confirm.',
+        }),
+        editor: Object.freeze({
+          title: 'Edit by hand here',
+          body: 'Change sizes, compartments, shelves, drawers and materials. Every change shows up in 3D right away.',
+        }),
+        viewer: Object.freeze({
+          title: 'Turn the wardrobe here',
+          body: 'Drag to rotate, scroll to zoom, and click a part to select it.',
+        }),
+      }),
     }),
   }),
 });

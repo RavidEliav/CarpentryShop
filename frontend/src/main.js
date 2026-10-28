@@ -22,6 +22,8 @@ import { createExportDialog } from './export/exportDialog.js';
 import { createRenderDialog } from './render/renderDialog.js';
 import { createLogo } from './ui/logo.js';
 import { installRipple } from './ui/ripple.js';
+import { icon } from './ui/icons.js';
+import { createTour } from './ui/tour.js';
 
 function showError(message) {
   const banner = document.getElementById('error-banner');
@@ -82,6 +84,19 @@ function bindDialogs({ storage, onSave, link }) {
   const render = createRenderDialog();
   document.getElementById('open-save').addEventListener('click', save.open);
   document.getElementById('open-render').addEventListener('click', render.open);
+}
+
+// The "?" button replays the tour; its label follows the chat language like the tour itself.
+function bindTourButton(tour, language) {
+  const button = document.getElementById('open-tour');
+  button.append(icon('help'));
+  const label = () => {
+    button.setAttribute('aria-label', language.strings().tour.replay);
+    button.title = language.strings().tour.replay;
+  };
+  label();
+  language.subscribe(label);
+  button.addEventListener('click', () => tour.start());
 }
 
 async function boot() {
@@ -153,18 +168,24 @@ async function boot() {
   });
   // A manual edit changes the revision, which may turn a pending proposal stale.
   store.subscribe(() => chat.refresh());
+  const tour = createTour({ language });
+  bindTourButton(tour, language);
 
   if (import.meta.env.DEV) {
     window.__banai = Object.freeze({ store, viewer, chat: chatModel });
   }
 
-  if (session) return; // reopened from a link: straight into the editor
+  if (session) {
+    tour.startIfNew(); // reopened from a link: straight into the editor
+    return;
+  }
   mountStartScreen({
     onChoose: (entry) => {
       // All three entry points open the same editor; the chat ones focus the composer, the manual
       // one the properties panel, so keyboard focus never falls out of the page when the modal closes.
       if (entry.focusesChat) chat.focus(entry.id);
       else document.getElementById('properties-panel').focus();
+      tour.startIfNew();
     },
   });
 }
