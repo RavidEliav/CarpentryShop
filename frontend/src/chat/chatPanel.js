@@ -169,6 +169,18 @@ export function mountChat(container, {
     ]);
     welcome.dataset.testid = 'chat-welcome';
 
+    // Quick requests send at once, through the same path as typing; the composer's text is left alone.
+    const quickPrompts = model.isConnected()
+      ? el('div', { className: 'quick-prompts', attrs: { role: 'group', 'aria-label': t.quickPromptsLabel, 'data-testid': 'quick-prompts' } }, t.quickPrompts.map((text) => {
+        const prompt = el('button', { className: 'quick-prompt', text, attrs: { type: 'button' } });
+        prompt.dataset.testid = 'quick-prompt';
+        prompt.addEventListener('click', () => {
+          if (!model.isBusy()) model.send(text);
+        });
+        return prompt;
+      }))
+      : null;
+
     const builtSlot = el('div', { className: 'chat__built-slot' });
     const list = el('div', { className: 'chat__messages', attrs: { role: 'log', 'aria-live': 'polite', 'aria-label': t.conversation } });
     list.dataset.testid = 'chat-messages';
@@ -209,8 +221,8 @@ export function mountChat(container, {
 
     const controls = model.isConnected() ? [readAloudToggle(t), languageSwitch(language, t)] : [languageSwitch(language, t)];
     const footerRow = el('div', { className: 'chat__footer-row' }, [hint, el('div', { className: 'chat__footer-controls' }, controls)]);
-    container.replaceChildren(header, el('div', { className: 'chat__body' }, [welcome, list, builtSlot, proposalSlot]), el('div', { className: 'chat__footer' }, [composer, footerRow]));
-    view = { t, input, sendButton, composer, welcome, list, proposalSlot, typing, submit, hint, mic, renderedCount: 0, renderedProposalKey: null, builtSlot, renderedBuiltKey: null };
+    container.replaceChildren(header, el('div', { className: 'chat__body' }, [welcome, list, builtSlot, proposalSlot]), el('div', { className: 'chat__footer' }, [...(quickPrompts ? [quickPrompts] : []), composer, footerRow]));
+    view = { t, input, sendButton, composer, welcome, list, proposalSlot, typing, submit, hint, mic, quickPrompts, renderedCount: 0, renderedProposalKey: null, builtSlot, renderedBuiltKey: null };
     showVoiceState();
   }
 
@@ -258,6 +270,7 @@ export function mountChat(container, {
     typing.hidden = !busy;
     if (busy) list.append(typing); // keep the indicator last, under the newest message
     sendButton.disabled = busy;
+    view.quickPrompts?.querySelectorAll('button').forEach((prompt) => { prompt.disabled = busy; });
     composer.setAttribute('aria-busy', String(busy));
     list.scrollTop = list.scrollHeight;
     showVoiceState();
