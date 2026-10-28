@@ -18,7 +18,7 @@ function saveBlob(blob, filename) {
 }
 
 /** getSnapshot() returns the 3D picture as a data URL, or throws (the PDF then uses its own drawing). */
-export function createExportDialog({ getDesign, getLanguage, getSnapshot = null, exportImpl = exportPdf }) {
+export function createExportDialog({ getDesign, getLanguage, getSnapshot = null, exportImpl = exportPdf, notify = () => {} }) {
   let language = getLanguage();
   let busy = false;
   const status = el('p', { className: 'dialog__status', attrs: { role: 'status' } });
@@ -47,6 +47,7 @@ export function createExportDialog({ getDesign, getLanguage, getSnapshot = null,
       const { blob, filename } = await exportImpl({ design, language, image });
       saveBlob(blob, filename);
       status.textContent = 'Your PDF is downloading.';
+      notify('PDF ready');
     } catch (error) {
       status.textContent = error?.message || FAILED;
     } finally {

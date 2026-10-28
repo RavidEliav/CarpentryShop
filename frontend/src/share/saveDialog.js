@@ -9,9 +9,10 @@ const SAVED = 'Saved. Use this link to reopen and keep editing.';
 
 /**
  * `available`: whether the server can store designs. `onSave()` saves the current design and resolves
- * to its private link. `link`: the link of a design that was reopened from one, if any.
+ * to its private link. `link`: the link of a design that was reopened from one, if any. `notify(text)`
+ * shows a short confirmation (a toast).
  */
-export function createSaveDialog({ available, onSave, link = '' }) {
+export function createSaveDialog({ available, onSave, link = '', notify = () => {} }) {
   const linkField = el('input', { className: 'field__input', attrs: { id: 'share-link', type: 'text', readonly: '', placeholder: 'Your private link will appear here', 'aria-label': 'Private share link' } });
   linkField.dataset.testid = 'share-link';
   linkField.value = link;
@@ -22,6 +23,7 @@ export function createSaveDialog({ available, onSave, link = '' }) {
     try {
       await navigator.clipboard.writeText(linkField.value);
       status.textContent = 'Link copied.';
+      notify('Link copied');
     } catch {
       linkField.select(); // clipboard blocked: leave it selected for a manual copy
       status.textContent = 'Select the link and copy it.';
@@ -35,6 +37,7 @@ export function createSaveDialog({ available, onSave, link = '' }) {
       linkField.value = await onSave();
       copy.disabled = false;
       status.textContent = SAVED;
+      notify('Design saved');
     } catch (error) {
       status.textContent = error?.message || 'Saving failed. Please try again.';
     } finally {

@@ -26,6 +26,7 @@ import { createLogo } from './ui/logo.js';
 import { installRipple } from './ui/ripple.js';
 import { icon } from './ui/icons.js';
 import { createTour } from './ui/tour.js';
+import { createToaster } from './ui/toast.js';
 
 function showError(message) {
   const banner = document.getElementById('error-banner');
@@ -82,8 +83,8 @@ function createSaver(store, language, initialSession, onSaved) {
   };
 }
 
-function bindDialogs({ storage, onSave, link }) {
-  const save = createSaveDialog({ available: storage, onSave, link });
+function bindDialogs({ storage, onSave, link, notify }) {
+  const save = createSaveDialog({ available: storage, onSave, link, notify });
   const render = createRenderDialog();
   document.getElementById('open-save').addEventListener('click', save.open);
   document.getElementById('open-render').addEventListener('click', render.open);
@@ -131,10 +132,13 @@ async function boot() {
   const viewer = createViewer(document.getElementById('viewer'), store);
   bindInteriorToggle(store);
   bindSkipLink();
+  const toaster = createToaster();
+  const notify = (text) => toaster.show(text);
   const exporter = createExportDialog({
     getDesign: () => store.getState().design,
     getLanguage: () => language.get(),
     getSnapshot: (design) => renderSnapshot(design, store.getState().catalog),
+    notify,
   });
   mountPanel(document.getElementById('properties-content'), store, { onExport: exporter.open });
   bindDialogs({
@@ -144,6 +148,7 @@ async function boot() {
       draft.sync();
     }),
     link: session ? window.location.href : '',
+    notify,
   });
 
   // The agent is optional: without an OpenAI key on the server the panel says so honestly.
@@ -169,6 +174,7 @@ async function boot() {
       const result = await applyProposal({ design, revision, proposal: proposal.signed, language: language.get() });
       store.replaceDesign(result.design, result.revision);
       chatModel.resolveProposal(t().applied);
+      notify('Change applied');
       chatModel.noteDesignReady(); // the final step: Generate Style Profile
     } catch (error) {
       chatModel.resolveProposal(error?.code === 'STALE' ? t().stale : t().notApplied);
