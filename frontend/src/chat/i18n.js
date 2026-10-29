@@ -197,6 +197,28 @@ export const STRINGS = Object.freeze({
       guided: 'Háblame del espacio: ¿qué ancho y alto debe tener el armario?',
       freeText: 'p. ej. 240 cm de ancho, 260 cm de alto, blanco, tres compartimentos',
     }),
+    tour: Object.freeze({
+      replay: 'Ver el recorrido',
+      progress: (n, total) => `${n} de ${total}`,
+      next: 'Siguiente',
+      back: 'Atrás',
+      skip: 'Omitir',
+      done: 'Listo',
+      steps: Object.freeze({
+        chat: Object.freeze({
+          title: 'Habla con el diseñador aquí',
+          body: 'Describe lo que quieres con tus propias palabras y el diseñador propone cambios. No cambia nada hasta que pulses Confirmar.',
+        }),
+        editor: Object.freeze({
+          title: 'Edita a mano aquí',
+          body: 'Cambia medidas, compartimentos, estantes, cajones y materiales. Cada cambio se ve en 3D al instante.',
+        }),
+        viewer: Object.freeze({
+          title: 'Gira el armario aquí',
+          body: 'Arrastra para girar, usa la rueda para acercar y haz clic en una pieza para seleccionarla.',
+        }),
+      }),
+    }),
   }),
 });
 

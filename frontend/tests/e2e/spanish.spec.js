@@ -66,4 +66,24 @@ test.describe('Spanish', () => {
     expect((await request).postDataJSON().language).toBe('es');
     expect((await download).suggestedFilename()).toMatch(/\.pdf$/);
   });
+
+  test('a returning Spanish visitor gets the app and the introduction tour in Spanish', async ({ page }) => {
+    // The chat language is remembered, so the app must also start with Spanish already chosen.
+    await page.addInitScript(() => window.localStorage.setItem('banai.chat.language', 'es'));
+    await openDesigner(page);
+    await expect(page.getByTestId('chat-language-es')).toHaveAttribute('aria-pressed', 'true');
+    const replay = page.getByTestId('open-tour');
+    await expect(replay).toHaveAccessibleName('Ver el recorrido');
+    await replay.click();
+    const tour = page.getByTestId('tour');
+    await expect(tour).toHaveAttribute('lang', 'es');
+    await expect(tour).toHaveAttribute('dir', 'ltr');
+    await expect(page.getByTestId('tour-progress')).toHaveText('1 de 3');
+    await expect(tour.getByRole('heading')).toHaveText('Habla con el diseñador aquí');
+    await page.getByTestId('tour-next').click();
+    await page.getByTestId('tour-next').click();
+    await expect(page.getByTestId('tour-next')).toHaveText('Listo');
+    await page.getByTestId('tour-next').click();
+    await expect(tour).toBeHidden();
+  });
 });
