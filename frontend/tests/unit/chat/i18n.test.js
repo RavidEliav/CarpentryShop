@@ -20,6 +20,18 @@ describe('chat strings', () => {
     expect(STRINGS.en.changeCount(1)).toBe('1 change');
     expect(STRINGS.he.changeCount(3)).toBe('3 שינויים');
   });
+
+  it('has 3 or 4 short quick requests in every language', () => {
+    LANGUAGES.forEach((lang) => {
+      const prompts = STRINGS[lang].quickPrompts;
+      expect(prompts.length, lang).toBeGreaterThanOrEqual(3);
+      expect(prompts.length, lang).toBeLessThanOrEqual(4);
+      prompts.forEach((text) => expect(text.trim().length, `${lang}: ${text}`).toBeGreaterThan(0));
+      expect(new Set(prompts).size, lang).toBe(prompts.length);
+      expect(STRINGS[lang].quickPromptsLabel, lang).toMatch(/\S/);
+    });
+    expect(STRINGS.he.quickPrompts.length).toBe(STRINGS.en.quickPrompts.length);
+  });
 });
 
 describe('createLanguage', () => {
