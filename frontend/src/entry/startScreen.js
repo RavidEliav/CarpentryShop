@@ -3,10 +3,12 @@ import { el } from '../editor/fields.js';
 import { icon } from '../ui/icons.js';
 import { createLogo } from '../ui/logo.js';
 import { ENTRY_POINTS } from './entryPoints.js';
+import { draftCard } from './draftPrompt.js';
 
 export const START_FOOTNOTE = 'Designs are illustrative previews and are not manufacturing drawings.';
 
-export function mountStartScreen({ onChoose }) {
+/** `draft` ({ time, onRestore, onDiscard }) adds a "Continue your draft" card above the three ways in. */
+export function mountStartScreen({ onChoose, draft = null }) {
   const cards = ENTRY_POINTS.map((entry) => {
     const action = el('button', { className: 'btn', attrs: { type: 'button' } }, [
       document.createTextNode(`${entry.action} `),
@@ -20,11 +22,27 @@ export function mountStartScreen({ onChoose }) {
       action,
     ]);
     action.addEventListener('click', () => {
-      dialog.close();
-      dialog.remove();
+      close();
       onChoose(entry);
     });
     return card;
+  });
+
+  const close = () => {
+    dialog.close();
+    dialog.remove();
+  };
+  const resume = draft && draftCard({
+    time: draft.time,
+    onRestore: () => {
+      close();
+      draft.onRestore();
+    },
+    onDiscard: () => {
+      draft.onDiscard();
+      resume.remove();
+      dialog.querySelector('[data-testid^="entry-"]').focus();
+    },
   });
 
   const dialog = el('dialog', { className: 'start', attrs: { 'aria-labelledby': 'start-title' } }, [
@@ -32,6 +50,7 @@ export function mountStartScreen({ onChoose }) {
     el('main', { className: 'start__main' }, [
       el('h1', { className: 'start__title', text: 'Design your wardrobe', attrs: { id: 'start-title' } }),
       el('p', { className: 'start__subtitle', text: 'Choose how you would like to begin. You can switch between the AI designer and manual editing at any time.' }),
+      ...(resume ? [resume] : []),
       el('div', { className: 'start__cards' }, cards),
       el('p', { className: 'start__footnote', text: START_FOOTNOTE }),
       el('a', { className: 'start__footnote', text: 'הצהרת נגישות', attrs: { href: '/accessibility.html', lang: 'he' } }),
