@@ -38,12 +38,13 @@ SPEECH_STYLE = (
     "Speak in the language of the text. For Hebrew, use fluent native Israeli Hebrew pronunciation. "
     "Calm, friendly furniture designer; clear and concise."
 )
-# Domain vocabulary in both languages: fixes Hebrew misrecognitions and writes sizes as digits,
-# without forcing a language (English speech stays English).
+# Domain vocabulary in all three languages: fixes Hebrew misrecognitions and writes sizes as digits,
+# without forcing a language (English or Spanish speech stays as spoken).
 TRANSCRIBE_PROMPT = (
-    "שיחה על עיצוב ארון בגדים, בעברית או באנגלית: ארון, תא, מדף, מגירה, מוט תלייה, מחיצה, "
+    "שיחה על עיצוב ארון בגדים, בעברית, באנגלית או בספרדית: ארון, תא, מדף, מגירה, מוט תלייה, מחיצה, "
     "דלתות הזזה, דלתות ציר, רוחב, גובה, עומק, סנטימטר, מט, מבריק. "
-    "Wardrobe design in Hebrew or English: shelf, drawer, hanging rail, sliding doors, width, cm."
+    "Wardrobe design in Hebrew, English or Spanish: shelf, drawer, hanging rail, sliding doors, width, cm. "
+    "Diseño de armario: estante, cajón, barra de colgar, puertas correderas, ancho, alto, cm."
 )
 PROMPTABLE_MODELS = {"gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"}
 # Abbreviations TTS reads letter by letter; spoken as words instead.

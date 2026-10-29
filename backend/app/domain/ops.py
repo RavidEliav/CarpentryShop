@@ -94,6 +94,10 @@ class ModifyPartition(StrictModel):
     thickness: Int | None = None
 
 
+class MirrorLayout(StrictModel):
+    op: Literal["mirror_layout"]
+
+
 class AddShelf(StrictModel):
     op: Literal["add_shelf"]
     compartment_id: CompartmentId
@@ -153,7 +157,7 @@ class RemoveComponent(StrictModel):
 
 Op = Annotated[
     CreateWardrobe | UpdateDimensions | ConfigureDoors | AddCompartment | ModifyCompartment
-    | AddPartition | ModifyPartition | AddShelf | ModifyShelf | AddDrawer | ModifyDrawer
+    | AddPartition | ModifyPartition | MirrorLayout | AddShelf | ModifyShelf | AddDrawer | ModifyDrawer
     | AddRail | ModifyRail | SetMaterial | RemoveComponent,
     Field(discriminator="op"),
 ]

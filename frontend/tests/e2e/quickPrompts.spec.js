@@ -75,6 +75,10 @@ test.describe('quick requests in the chat', () => {
       .filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {})))); // the online dot pulses forever
     const { violations } = await new AxeBuilder({ page }).include('#chat-panel').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
     expect(violations.map((v) => v.id)).toEqual([]);
+
+    await page.getByTestId('chat-language-es').click();
+    await expect(chips(page)).toHaveText(['Añadir cajones', 'Hazlo de 2,5 m de ancho', 'Puertas correderas', 'Añadir una barra de colgar']);
+    await expect(page.getByTestId('quick-prompts')).toHaveAttribute('aria-label', 'Peticiones rápidas');
   });
 
   test('are not shown when the AI designer is not connected', async ({ page }) => {

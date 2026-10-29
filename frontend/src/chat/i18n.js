@@ -1,8 +1,8 @@
-// Chat panel strings in Hebrew and English. The agent replies only in the language a message is
+// Chat panel strings in Hebrew, English and Spanish. The agent replies only in the language a message is
 // written in; sending a message switches the chat to that language, so UI and replies always match.
 // The switch also sets the language for messages without letters (e.g. "240?").
 
-export const LANGUAGES = Object.freeze(['he', 'en']);
+export const LANGUAGES = Object.freeze(['he', 'en', 'es']);
 export const DEFAULT_LANGUAGE = 'he';
 const STORAGE_KEY = 'banai.chat.language';
 
@@ -153,15 +153,113 @@ export const STRINGS = Object.freeze({
       }),
     }),
   }),
+  es: Object.freeze({
+    dir: 'ltr',
+    switchLabel: 'Idioma del chat',
+    title: 'Diseñador IA',
+    subtitle: 'Asistente de diseño',
+    online: 'En línea',
+    onlineTitle: 'El diseñador con IA está conectado.',
+    comingSoon: 'Próximamente',
+    comingSoonTitle: 'El diseñador con IA aún no está conectado.',
+    placeholder: 'Describe tu armario…',
+    inputLabel: 'Mensaje para el diseñador',
+    send: 'Enviar mensaje',
+    mic: 'Habla con el diseñador',
+    micStop: 'Detener la grabación y enviar',
+    recording: 'Grabando… pulsa de nuevo para enviar',
+    transcribing: 'Convirtiendo la voz en texto…',
+    micDenied: 'No hay acceso al micrófono. Permítelo en el navegador o escribe tu mensaje.',
+    voiceError: 'No he entendido la grabación. Inténtalo de nuevo.',
+    readAloud: 'Leer las respuestas en voz alta (voz generada por IA)',
+    readAloudOn: 'Las respuestas se leerán con una voz generada por IA.',
+    hint: 'Enter para enviar · Shift+Enter para una línea nueva',
+    welcomeLabel: 'Empecemos',
+    welcomeTitle: '¿Qué diseñamos hoy?',
+    welcomeText: 'Describe tu armario con tus propias palabras. Lo convertiré en una propuesta que confirmas antes de que cambie nada.',
+    suggestions: Object.freeze([
+      'Armario de 240 cm de ancho y 260 cm de alto, blanco, con tres compartimentos',
+      'Armario alto con puertas correderas y una barra de colgar',
+      'Cuatro estantes a la izquierda, barra en el centro y tres cajones a la derecha',
+    ]),
+    quickPromptsLabel: 'Peticiones rápidas',
+    quickPrompts: Object.freeze(['Añadir cajones', 'Hazlo de 2,5 m de ancho', 'Puertas correderas', 'Añadir una barra de colgar']),
+    conversation: 'Conversación',
+    thinking: 'El diseñador está pensando',
+    proposalHeading: 'Cambios propuestos',
+    changeCount: (n) => (n === 1 ? '1 cambio' : `${n} cambios`),
+    proposalNote: 'Aún no se ha aplicado. Confirma para aplicar estos cambios a tu diseño.',
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+    notConnected: 'El diseñador con IA aún no está conectado. Puedes diseñar a mano en el panel de propiedades.',
+    stale: 'El diseño cambió. Pide al diseñador una nueva propuesta.',
+    agentError: 'El diseñador no ha podido responder ahora. Inténtalo de nuevo en un momento.',
+    applied: 'Aplicado. Tu diseño se ha actualizado.',
+    notApplied: 'No se pudo aplicar la propuesta. No se ha cambiado nada.',
+    cancelled: 'Propuesta cancelada. No se ha cambiado nada.',
+    readyForProfile: '¿Tu diseño está listo? Descarga el archivo para tu carpintero.',
+    generateProfile: 'Generate Style Profile',
+    composerHints: Object.freeze({
+      guided: 'Háblame del espacio: ¿qué ancho y alto debe tener el armario?',
+      freeText: 'p. ej. 240 cm de ancho, 260 cm de alto, blanco, tres compartimentos',
+    }),
+    tour: Object.freeze({
+      replay: 'Ver el recorrido',
+      progress: (n, total) => `${n} de ${total}`,
+      next: 'Siguiente',
+      back: 'Atrás',
+      skip: 'Omitir',
+      done: 'Listo',
+      steps: Object.freeze({
+        chat: Object.freeze({
+          title: 'Habla con el diseñador aquí',
+          body: 'Describe lo que quieres con tus propias palabras y el diseñador propone cambios. No cambia nada hasta que pulses Confirmar.',
+        }),
+        editor: Object.freeze({
+          title: 'Edita a mano aquí',
+          body: 'Cambia medidas, compartimentos, estantes, cajones y materiales. Cada cambio se ve en 3D al instante.',
+        }),
+        viewer: Object.freeze({
+          title: 'Gira el armario aquí',
+          body: 'Arrastra para girar, usa la rueda para acercar y haz clic en una pieza para seleccionarla.',
+        }),
+      }),
+    }),
+  }),
 });
 
 export const stringsFor = (language) => STRINGS[language] ?? STRINGS[DEFAULT_LANGUAGE];
 
-/** 'he' | 'en' | null (no letters). Hebrew wins in mixed text. Mirrors backend app/agent/language.py. */
-export function detectLanguage(text) {
+// Words only one of English and Spanish uses (shared spellings such as "no", "me", "color" are left
+// out, and so are catalog names, which Spanish messages use too). Mirrors backend app/agent/language.py;
+// parity: shared/fixtures/language/detect.json.
+const SPANISH_WORDS = new Set(`
+quiero quisiera armario armarios puerta puertas estante estantes balda baldas cajon cajón cajones ancho
+alto altura profundidad fondo añade añadir agrega agregar pon poner haz hacer quita quitar cambia cambiar
+con una uno el la los las del de en y para por que qué más mas menos blanco negro madera nogal roble
+barra colgar centímetros centimetros compartimento compartimentos hola gracias cuánto cuanto cuesta
+precio medio izquierda derecha corredera correderas batiente batientes espejo listo terminado gris
+`.split(/\s+/).filter(Boolean));
+const ENGLISH_WORDS = new Set(`
+the and with add make please wardrobe shelf shelves door doors drawer drawers wide tall high deep rail
+hanging i want can you what how much change remove set to of in on it is left right middle white black
+sliding hinged mirror hello hi thanks cost done finished grey gray
+`.split(/\s+/).filter(Boolean));
+
+/**
+ * 'he' | 'en' | 'es' | null (no letters). Hebrew wins in mixed text. Latin text is Spanish or English
+ * by its Spanish marks and by words only one language uses; a tie (e.g. "240 cm") keeps `chosen` when
+ * it is English or Spanish, else English. Mirrors backend app/agent/language.py (detect).
+ */
+export function detectLanguage(text, chosen = null) {
   if (/[א-ת]/.test(text)) return 'he';
-  if (/[A-Za-z]/.test(text)) return 'en';
-  return null;
+  if (!/[A-Za-zñáéíóúüÑÁÉÍÓÚÜ]/.test(text)) return null;
+  const lowered = text.toLowerCase();
+  const words = lowered.match(/[a-zñáéíóúü]+/g) ?? [];
+  const spanish = 2 * (lowered.match(/[ñáéíóúü¿¡]/g) ?? []).length + words.filter((word) => SPANISH_WORDS.has(word)).length;
+  const english = words.filter((word) => ENGLISH_WORDS.has(word)).length;
+  if (spanish !== english) return spanish > english ? 'es' : 'en';
+  return chosen === 'en' || chosen === 'es' ? chosen : 'en';
 }
 
 function readStored(storage) {

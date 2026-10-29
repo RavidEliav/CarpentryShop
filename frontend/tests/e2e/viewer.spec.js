@@ -66,3 +66,47 @@ test.describe('Phase 3: 3D viewer', () => {
     expect(selected).toBe('shf_r1');
   });
 });
+
+test.describe('camera focus', () => {
+  const targetX = (page) => page.evaluate(() => window.__banai.viewer.controls.target.x);
+  const settled = async (page) => {
+    await page.waitForTimeout(700);
+    return targetX(page);
+  };
+
+  test('selecting a compartment centres the camera on it, double-click on empty space returns to the overview', async ({ page }) => {
+    await openDesigner(page);
+    const overview = await targetX(page);
+    const before = await page.evaluate(() => JSON.stringify(window.__banai.store.getState().design));
+    await page.evaluate(() => window.__banai.store.select('cmp_right'));
+    const right = await settled(page);
+    expect(right).toBeGreaterThan(overview + 0.3);
+    await page.evaluate(() => window.__banai.store.select('cmp_left'));
+    expect(await settled(page)).toBeLessThan(overview - 0.3);
+    // the camera is not part of the design
+    expect(await page.evaluate(() => JSON.stringify(window.__banai.store.getState().design))).toBe(before);
+
+    const box = await page.locator('canvas').first().boundingBox();
+    await page.mouse.dblclick(box.x + 10, box.y + 10);
+    expect(await settled(page)).toBeCloseTo(overview, 3);
+  });
+
+  test('selecting a shelf leaves the camera alone; the middle compartment is already centred', async ({ page }) => {
+    await openDesigner(page);
+    const overview = await targetX(page);
+    await page.evaluate(() => window.__banai.store.select('shf_l2'));
+    expect(await settled(page)).toBeCloseTo(overview, 3);
+    await page.evaluate(() => window.__banai.store.select('cmp_middle'));
+    expect(await settled(page)).toBeCloseTo(overview, 1); // the middle compartment is at the centre
+  });
+
+  test.describe('reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+    test('the camera jumps instead of gliding', async ({ page }) => {
+      await openDesigner(page);
+      const overview = await targetX(page);
+      await page.evaluate(() => window.__banai.store.select('cmp_right'));
+      expect(await targetX(page)).toBeGreaterThan(overview + 0.3); // no waiting: already there
+    });
+  });
+});

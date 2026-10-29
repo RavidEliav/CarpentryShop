@@ -36,6 +36,7 @@ export const opSchema = z.discriminatedUnion('op', [
     compartmentId: cmpId(), offset: int(), id: opt(typedId(ids.PARTITION)), newCompartmentId: opt(cmpId()), thickness: opt(int()),
   }),
   op('modify_partition', { partitionId: typedId(ids.PARTITION), position: opt(int()), thickness: opt(int()) }),
+  op('mirror_layout', {}),
   op('add_shelf', { compartmentId: cmpId(), y: int(), thickness: opt(int()), id: opt(typedId(ids.SHELF)) }),
   op('modify_shelf', { id: typedId(ids.SHELF), y: opt(int()), thickness: opt(int()) }),
   op('add_drawer', { compartmentId: cmpId(), y: int(), height: int(), id: opt(typedId(ids.DRAWER)) }),

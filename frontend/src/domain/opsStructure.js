@@ -178,6 +178,23 @@ function modifyPartition(draft, op, path) {
   return draft;
 }
 
+// Reverse the compartments left to right. Ids, widths and items move with their compartment;
+// partitions reverse too, so the width invariant holds. Hinged doors keep their compartments
+// (reordered left to right) and swap hinge sides; doors are listed left to right again.
+function mirrorLayout(draft) {
+  draft.compartments.reverse();
+  draft.partitions.reverse();
+  const { doors } = draft;
+  doors.items.reverse();
+  if (doors.type === 'hinged') {
+    for (const d of doors.items) {
+      d.compartmentIds.reverse();
+      d.hingeSide = d.hingeSide === 'left' ? 'right' : 'left';
+    }
+  }
+  return draft;
+}
+
 function removeComponent(draft, op, path) {
   const found = locate(draft, op.id);
   if (!found) throw new DomainError(NOT_FOUND, `${path}.id`, 'no component with this id');
@@ -245,5 +262,6 @@ export const STRUCTURE_HANDLERS = Object.freeze({
   modify_compartment: modifyCompartment,
   add_partition: addPartition,
   modify_partition: modifyPartition,
+  mirror_layout: mirrorLayout,
   remove_component: removeComponent,
 });

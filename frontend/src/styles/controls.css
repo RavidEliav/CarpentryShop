@@ -160,6 +160,7 @@ select.field__input {
 /* List items */
 .compartment-list { margin: 0; padding: 0; list-style: none; }
 .compartment-row {
+  position: relative; /* contains the visually hidden labels, so they never stretch the page */
   display: grid;
   grid-template-columns: 1fr 120px auto;
   align-items: center;

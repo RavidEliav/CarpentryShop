@@ -172,6 +172,21 @@ def test_confirm_applies_the_signed_ops(make_client):
     assert any(s["id"] == proposal["ops"][0]["id"] and s["y"] == 1000 for s in shelves)
 
 
+def test_mirror_layout_can_be_proposed_and_confirmed(make_client):
+    fake = FakeClient(completion(calls=[tool_call(PROPOSE, propose(
+        [{"op": "mirror_layout"}], summary="היפוך הסידור", changes=[{"title": "סידור", "detail": "התאים מתהפכים"}],
+    ))]))
+    client = make_client(fake)
+    data = client.post("/api/chat", json=chat_body(text="תהפוך את הסידור", revision=2)).json()["data"]
+    system_prompt = fake.requests[0]["messages"][0]["content"]
+    assert "mirror_layout" in system_prompt and "תהפוך את" in system_prompt  # the agent knows the op and the phrase
+    proposal = data["proposal"]
+    assert proposal["ops"] == [{"op": "mirror_layout"}]
+    applied = client.post("/api/proposals/apply", json={"design": basic_wardrobe(), "revision": 2, "proposal": proposal})
+    design = applied.json()["data"]["design"]
+    assert [c["id"] for c in design["compartments"]] == ["cmp_right", "cmp_middle", "cmp_left"]
+
+
 def test_stale_revision_or_design_is_409(make_client):
     client = make_client(FakeClient(completion(calls=[tool_call(PROPOSE, propose([ADD_SHELF]))])))
     proposal = _proposal_for(client, revision=3)

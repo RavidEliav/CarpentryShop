@@ -186,3 +186,15 @@ describe('security hardening (phase 2 gate)', () => {
     expect(performance.now() - started).toBeLessThan(2000);
   });
 });
+
+describe('mirror_layout', () => {
+  it.each(['two', 'basic'])('mirrors every compartment of %s in place, keeping the width', (name) => {
+    const design = loadDesign(name);
+    const result = applyOps(design, [{ op: 'mirror_layout' }], catalog);
+    const width = interiorWidth(design);
+    expect(interiorWidth(result)).toBe(width); // width invariant
+    const ranges = (d) => Object.fromEntries(d.compartments.map((c, i) => [c.id, compartmentXRanges(d)[i]]));
+    const mirrored = Object.fromEntries(Object.entries(ranges(design)).map(([id, [x0, x1]]) => [id, [width - x1, width - x0]]));
+    expect(ranges(result)).toEqual(mirrored);
+  });
+});

@@ -6,7 +6,7 @@ import { componentSection } from './componentSection.js';
 import { partsSection } from './partsSection.js';
 import { wardrobeSection } from './wardrobeSection.js';
 
-export function mountPanel(root, store, { onExport } = {}) {
+export function mountPanel(root, store, { onExport, units } = {}) {
   const run = (ops) => {
     try {
       return store.dispatch(ops);
@@ -15,12 +15,13 @@ export function mountPanel(root, store, { onExport } = {}) {
     }
   };
   const select = (id) => store.select(id);
-  let rendered = { design: null, selection: undefined };
+  let rendered = { design: null, selection: undefined, unit: undefined };
 
   const render = (state) => {
-    if (state.design === rendered.design && state.selection === rendered.selection) return;
-    rendered = { design: state.design, selection: state.selection };
-    const context = { design: state.design, catalog: state.catalog, selection: state.selection, run, select, onExport };
+    const unit = units?.get() ?? 'cm';
+    if (state.design === rendered.design && state.selection === rendered.selection && unit === rendered.unit) return;
+    rendered = { design: state.design, selection: state.selection, unit };
+    const context = { design: state.design, catalog: state.catalog, selection: state.selection, run, select, onExport, unit };
     // Re-rendering replaces every control: put keyboard focus back on the same one (WCAG 2.4.3).
     const focused = root.contains(document.activeElement) ? document.activeElement.dataset.testid : undefined;
     root.replaceChildren(
@@ -33,6 +34,7 @@ export function mountPanel(root, store, { onExport } = {}) {
   };
 
   const unsubscribe = store.subscribe(render);
+  const unsubscribeUnits = units?.subscribe(() => render(store.getState()));
   render(store.getState());
-  return unsubscribe;
+  return () => { unsubscribe(); unsubscribeUnits?.(); };
 }

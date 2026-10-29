@@ -48,7 +48,7 @@ export function fromServerProposal(signed, language = DEFAULT_LANGUAGE) {
  * @param getRevision  () => current committed revision
  * @param agent        optional async ({ messages, language }) => { reply, proposal|null }, where
  *                     messages is the user/assistant history ending with the new customer message
- * @param getLanguage  () => the chat language ('he' | 'en'): the agent replies in it, and so do UI notes
+ * @param getLanguage  () => the chat language ('he' | 'en' | 'es'): the agent replies in it, and so do UI notes
  */
 export function createChatModel({ getRevision, agent = null, getLanguage = () => DEFAULT_LANGUAGE }) {
   let nextId = 1;

@@ -199,6 +199,21 @@ def modify_partition(draft: dict, op: op_types.ModifyPartition, path: str) -> di
     return draft
 
 
+def mirror_layout(draft: dict, _op: op_types.MirrorLayout, _path: str) -> dict:
+    """Reverse the compartments left to right. Ids, widths and items move with their compartment;
+    partitions reverse too, so the width invariant holds. Hinged doors keep their compartments
+    (reordered left to right) and swap hinge sides; doors are listed left to right again."""
+    draft["compartments"].reverse()
+    draft["partitions"].reverse()
+    doors = draft["doors"]
+    doors["items"].reverse()
+    if doors["type"] == "hinged":
+        for door in doors["items"]:
+            door["compartmentIds"].reverse()
+            door["hingeSide"] = "right" if door["hingeSide"] == "left" else "left"
+    return draft
+
+
 def remove_component(draft: dict, op: op_types.RemoveComponent, path: str) -> dict:
     found = locate(draft, op.id)
     if found is None:
@@ -272,5 +287,6 @@ STRUCTURE_HANDLERS = {
     op_types.ModifyCompartment: modify_compartment,
     op_types.AddPartition: add_partition,
     op_types.ModifyPartition: modify_partition,
+    op_types.MirrorLayout: mirror_layout,
     op_types.RemoveComponent: remove_component,
 }

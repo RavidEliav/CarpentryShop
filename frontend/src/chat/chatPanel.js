@@ -10,7 +10,8 @@ import { renderProposalCard } from './proposalCard.js';
 import { canRecord, createSpeaker, readAloudPreference, startRecording } from './voice.js';
 import { transcribe } from '../api/client.js';
 
-const LANGUAGE_NAMES = Object.freeze({ he: 'עב', en: 'EN' });
+const LANGUAGE_NAMES = Object.freeze({ he: 'עב', en: 'EN', es: 'ES' });
+const LANGUAGE_TITLES = Object.freeze({ he: 'עברית', en: 'English', es: 'Español' });
 
 function languageSwitch(language, t) {
   const group = el('div', { className: 'lang-switch', attrs: { role: 'group', 'aria-label': t.switchLabel } });
@@ -19,7 +20,7 @@ function languageSwitch(language, t) {
     const option = el('button', {
       className: 'lang-switch__option',
       text: LANGUAGE_NAMES[code],
-      attrs: { type: 'button', lang: code, 'aria-pressed': String(code === language.get()), title: code === 'he' ? 'עברית' : 'English' },
+      attrs: { type: 'button', lang: code, 'aria-pressed': String(code === language.get()), title: LANGUAGE_TITLES[code] },
     });
     option.dataset.testid = `chat-language-${code}`;
     option.addEventListener('click', () => language.set(code));
@@ -194,9 +195,9 @@ export function mountChat(container, {
     const submit = () => {
       if (model.isBusy() || !input.value.trim()) return;
       voice.notice = null; // a new message clears an old mic/read-aloud notice
-      // Writing in Hebrew or English switches the chat to that language first, so the reply (and
-      // the UI) come back only in the language the customer wrote in.
-      const written = detectLanguage(input.value);
+      // Writing in Hebrew, English or Spanish switches the chat to that language first, so the reply
+      // (and the UI) come back only in the language the customer wrote in.
+      const written = detectLanguage(input.value, language.get());
       if (written && written !== language.get()) {
         draft = input.value;
         language.set(written); // rebuilds the panel; the draft is carried over

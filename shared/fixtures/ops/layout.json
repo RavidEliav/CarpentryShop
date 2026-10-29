@@ -108,5 +108,92 @@
     "base": "two",
     "ops": [{ "op": "remove_component", "id": "shf_zzz" }],
     "expect": { "error": { "code": "NOT_FOUND", "path": "ops[0].id" } }
+  },
+  {
+    "name": "mirror_layout reverses compartments; ids and contents stay with each compartment",
+    "base": "two",
+    "ops": [{ "op": "mirror_layout" }],
+    "expect": { "match": {
+      "dimensions": { "width": 1000 },
+      "compartments": [
+        { "id": "cmp_b", "width": 470, "shelves": [], "drawers": [], "rails": [{ "id": "rail_1", "y": 1700 }] },
+        { "id": "cmp_a", "width": 470, "shelves": [{ "id": "shf_1", "y": 500 }], "drawers": [{ "id": "drw_1", "y": 0 }], "rails": [] }
+      ],
+      "partitions": [{ "id": "prt_ab", "thickness": 20 }],
+      "doors": { "type": "hinged", "items": [
+        { "id": "dr_b", "compartmentIds": ["cmp_b"], "hingeSide": "left" },
+        { "id": "dr_a", "compartmentIds": ["cmp_a"], "hingeSide": "right" }
+      ] }
+    } }
+  },
+  {
+    "name": "mirror_layout reverses unequal partitions and widths (width invariant holds)",
+    "base": "basic",
+    "mutate": [
+      { "path": ["partitions", 0, "thickness"], "value": 30 },
+      { "path": ["compartments", 0, "width"], "value": 631 }
+    ],
+    "ops": [{ "op": "mirror_layout" }],
+    "expect": { "match": {
+      "dimensions": { "width": 2000 },
+      "carcass": { "panelThickness": 18 },
+      "compartments": [{ "id": "cmp_right", "width": 642 }, { "id": "cmp_middle", "width": 643 }, { "id": "cmp_left", "width": 631 }],
+      "partitions": [{ "id": "prt_2", "thickness": 18 }, { "id": "prt_1", "thickness": 30 }]
+    } }
+  },
+  {
+    "name": "mirror_layout keeps a spanning hinged door in left-to-right order and swaps its hinge",
+    "base": "two",
+    "ops": [
+      { "op": "configure_doors", "type": "hinged", "doors": [{ "id": "dr_wide", "compartmentIds": ["cmp_a", "cmp_b"], "hingeSide": "left" }] },
+      { "op": "mirror_layout" }
+    ],
+    "expect": { "match": {
+      "doors": { "type": "hinged", "items": [{ "id": "dr_wide", "compartmentIds": ["cmp_b", "cmp_a"], "hingeSide": "right" }] }
+    } }
+  },
+  {
+    "name": "mirror_layout reverses the order of sliding panels",
+    "base": "two",
+    "ops": [
+      { "op": "configure_doors", "type": "sliding", "ids": ["dr_1", "dr_2", "dr_3"] },
+      { "op": "mirror_layout" }
+    ],
+    "expect": { "match": {
+      "doors": { "type": "sliding", "items": [
+        { "id": "dr_3", "compartmentIds": [], "hingeSide": null },
+        { "id": "dr_2", "compartmentIds": [], "hingeSide": null },
+        { "id": "dr_1", "compartmentIds": [], "hingeSide": null }
+      ] }
+    } }
+  },
+  {
+    "name": "mirror_layout without doors only reverses the compartments",
+    "base": "two",
+    "ops": [{ "op": "configure_doors", "type": "none" }, { "op": "mirror_layout" }],
+    "expect": { "match": {
+      "compartments": [{ "id": "cmp_b" }, { "id": "cmp_a" }],
+      "doors": { "type": "none", "items": [] }
+    } }
+  },
+  {
+    "name": "mirror_layout twice restores the original layout",
+    "base": "basic",
+    "ops": [{ "op": "mirror_layout" }, { "op": "mirror_layout" }],
+    "expect": { "match": {
+      "compartments": [{ "id": "cmp_left" }, { "id": "cmp_middle" }, { "id": "cmp_right" }],
+      "partitions": [{ "id": "prt_1" }, { "id": "prt_2" }],
+      "doors": { "items": [
+        { "id": "dr_left", "hingeSide": "left" },
+        { "id": "dr_middle", "hingeSide": "right" },
+        { "id": "dr_right", "hingeSide": "left" }
+      ] }
+    } }
+  },
+  {
+    "name": "mirror_layout takes no fields",
+    "base": "two",
+    "ops": [{ "op": "mirror_layout", "compartmentId": "cmp_a" }],
+    "expect": { "error": { "code": "SCHEMA_INVALID" } }
   }
 ]

@@ -1,0 +1,21 @@
+{
+  "description": "Reply-language detection, shared by backend (app/agent/language.py) and frontend (src/chat/i18n.js). chosen = the chat's current language.",
+  "cases": [
+    { "text": "תוסיף מדף", "chosen": "en", "expected": "he" },
+    { "text": "תצבע ב-Walnut", "chosen": "es", "expected": "he" },
+    { "text": "Add a shelf", "chosen": "he", "expected": "en" },
+    { "text": "Add a shelf", "chosen": "es", "expected": "en" },
+    { "text": "Make the wardrobe 240 cm wide", "chosen": "es", "expected": "en" },
+    { "text": "Quiero un armario de 240 cm", "chosen": "he", "expected": "es" },
+    { "text": "Añade tres cajones a la derecha", "chosen": "en", "expected": "es" },
+    { "text": "¿Cuánto cuesta?", "chosen": "en", "expected": "es" },
+    { "text": "puertas correderas con espejo", "chosen": "en", "expected": "es" },
+    { "text": "240 cm", "chosen": "es", "expected": "es" },
+    { "text": "240 cm", "chosen": "en", "expected": "en" },
+    { "text": "240 cm", "chosen": "he", "expected": "en" },
+    { "text": "Walnut", "chosen": "es", "expected": "es" },
+    { "text": "OK", "chosen": "he", "expected": "en" },
+    { "text": "240?", "chosen": "es", "expected": null },
+    { "text": "", "chosen": "en", "expected": null }
+  ]
+}

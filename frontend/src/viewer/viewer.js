@@ -1,16 +1,16 @@
 // Interactive Three.js viewer. Renders ONLY from store state: it rebuilds the wardrobe
 // whenever the committed design (or door visibility) changes, and never edits state
-// except through store.select().
+// except through store.select(). The camera is view state: it is never part of the design or the store.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { buildWardrobe, disposeWardrobe } from './buildWardrobe.js';
 import { frameOf } from './builders/frame.js';
+import { compartmentPose, createFlight, overviewPose } from './cameraFocus.js';
 import { createDimensions } from './dimensions.js';
 import { createHighlighter } from './highlight.js';
 import { createMaterials } from './materials.js';
 import { attachPicking } from './picking.js';
-import { toM } from './units.js';
 
 const BACKGROUND = '#eceeec';
 
@@ -41,7 +41,7 @@ function componentAt(hit, design) {
   return index >= 0 ? design.compartments[index].id : componentId;
 }
 
-export function createViewer(container, store) {
+export function createViewer(container, store, { units } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -62,15 +62,31 @@ export function createViewer(container, store) {
   const highlighter = createHighlighter(scene);
   const dimensions = createDimensions(scene);
   let group = null;
-  let rendered = { design: null, doorsVisible: null, selection: undefined, dimsKey: null };
+  let rendered = { design: null, doorsVisible: null, selection: undefined, dimsKey: null, focusKey: null };
+  const flight = createFlight(camera, controls);
+  controls.addEventListener('start', () => flight.cancel()); // the customer took the camera: stop moving it
+  const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   const fitCamera = (design) => {
-    const { width, height, depth } = design.dimensions;
-    const center = new THREE.Vector3(toM(width / 2), toM(height / 2), toM(-depth / 2));
-    const distance = (toM(Math.max(width, height)) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) * 1.35;
-    camera.position.set(center.x + distance * 0.35, center.y + distance * 0.12, distance);
-    controls.target.copy(center);
+    const { target, position } = overviewPose(design, camera.fov);
+    flight.cancel();
+    camera.position.copy(position);
+    controls.target.copy(target);
     controls.update();
+  };
+
+  /** Selecting a compartment centres the camera on it; any other selection leaves the camera alone. */
+  const focusSelection = (design, selection) => {
+    const focusKey = selection?.kind === 'compartment' ? selection.id : null;
+    if (focusKey === rendered.focusKey) return; // an edit re-resolves the selection: do not yank the camera
+    rendered = { ...rendered, focusKey };
+    const pose = focusKey && compartmentPose(design, focusKey, { position: camera.position, target: controls.target });
+    if (pose) flight.start(pose, reducedMotion());
+  };
+
+  const showOverview = () => {
+    flight.start(overviewPose(store.getState().design, camera.fov), reducedMotion());
+    rendered = { ...rendered, focusKey: null };
   };
 
   const sync = (state) => {
@@ -91,8 +107,9 @@ export function createViewer(container, store) {
     }
     if (geometryChanged || selection !== rendered.selection) {
       highlighter.update(group, design, selection);
-      dimensions.update(group, design, selection);
+      dimensions.update(group, design, selection, units?.get());
       rendered = { ...rendered, selection };
+      focusSelection(design, selection);
     }
   };
 
@@ -113,11 +130,18 @@ export function createViewer(container, store) {
     getTargets: () => (group ? group.children : []),
     onPick: (hit) => store.select(componentAt(hit, store.getState().design)),
     onHover: (hit) => { renderer.domElement.style.cursor = hit?.object.userData.componentId ? 'pointer' : ''; },
+    onDoubleClick: (hit) => { if (!hit) showOverview(); }, // double-click on empty background: back to the general view
   });
   const unsubscribe = store.subscribe(sync);
+  // The unit only changes the label text: redraw the labels, never the wardrobe.
+  const unsubscribeUnits = units?.subscribe(() => {
+    const { design, selection } = store.getState();
+    dimensions.update(group, design, selection, units.get());
+  });
   sync(store.getState());
 
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop((now) => {
+    flight.step(now);
     controls.update();
     renderer.render(scene, camera);
     labels.render(scene, camera);
@@ -139,6 +163,7 @@ export function createViewer(container, store) {
     dispose() {
       renderer.setAnimationLoop(null);
       unsubscribe();
+      unsubscribeUnits?.();
       detachPicking();
       resizeObserver.disconnect();
       if (group) disposeWardrobe(group);

@@ -30,6 +30,7 @@ describe('tour steps and texts', () => {
     });
     expect(STRINGS.en.tour.progress(2, 3)).toBe('2 of 3');
     expect(STRINGS.he.tour.progress(2, 3)).toBe('2 מתוך 3');
+    expect(STRINGS.es.tour.progress(2, 3)).toBe('2 de 3');
   });
 });
 

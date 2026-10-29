@@ -2,7 +2,8 @@
 // component. Labels are CSS2D DOM nodes written with textContent only (never HTML).
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cm, describeSelection } from './format.js';
+import { describeSelection } from './format.js';
+import { formatWithUnit } from '../units/displayUnits.js';
 import { toM } from './units.js';
 
 const OFFSET = 80; // mm, distance of dimension lines from the carcass (visual only)
@@ -39,20 +40,20 @@ export function createDimensions(scene) {
   };
 
   return {
-    update(group, design, selection) {
+    update(group, design, selection, unit = 'cm') {
       clear();
       const { width: w, height: h, depth: d } = design.dimensions;
       line([0, h + OFFSET, 0], [w, h + OFFSET, 0]);
-      place(label(`W ${cm(w)} cm`, 'dim-label'), [w / 2, h + OFFSET, 0]);
+      place(label(`W ${formatWithUnit(w, unit)}`, 'dim-label'), [w / 2, h + OFFSET, 0]);
       line([-OFFSET, 0, 0], [-OFFSET, h, 0]);
-      place(label(`H ${cm(h)} cm`, 'dim-label'), [-OFFSET, h / 2, 0]);
+      place(label(`H ${formatWithUnit(h, unit)}`, 'dim-label'), [-OFFSET, h / 2, 0]);
       line([w + OFFSET, 0, 0], [w + OFFSET, 0, -d]);
-      place(label(`D ${cm(d)} cm`, 'dim-label'), [w + OFFSET, 0, -d / 2]);
+      place(label(`D ${formatWithUnit(d, unit)}`, 'dim-label'), [w + OFFSET, 0, -d / 2]);
 
       if (!selection || !group) return;
       const target = group.children.find((mesh) => mesh.userData.componentId === selection.id);
       const anchor = target ? target.position : new THREE.Vector3(toM(w / 2), toM(h / 2), 0);
-      const selected = label(describeSelection(design, selection), 'dim-label dim-label--selected');
+      const selected = label(describeSelection(design, selection, unit), 'dim-label dim-label--selected');
       selected.position.copy(anchor);
       selected.center.set(0.5, 1.6); // sit above the component instead of covering it
       layer.add(selected);

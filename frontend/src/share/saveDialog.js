@@ -30,12 +30,22 @@ export function createSaveDialog({ available, onSave, link = '', notify = () => 
     }
   }, { variant: 'secondary', testId: 'copy-link', disabled: !link });
 
+  // The system share sheet; browsers without navigator.share never see the button.
+  const share = typeof navigator.share === 'function' ? button('Share', async () => {
+    try {
+      await navigator.share({ title: 'My BanAI wardrobe design', url: linkField.value });
+    } catch (error) {
+      if (error?.name !== 'AbortError') status.textContent = 'Sharing failed. Copy the link instead.';
+    }
+  }, { variant: 'secondary', testId: 'share-link-native', disabled: !link }) : null;
+
   const save = button('Save design', async () => {
     save.disabled = true;
     status.textContent = 'Saving…';
     try {
       linkField.value = await onSave();
       copy.disabled = false;
+      if (share) share.disabled = false;
       status.textContent = SAVED;
       notify('Design saved');
     } catch (error) {
@@ -58,7 +68,7 @@ export function createSaveDialog({ available, onSave, link = '', notify = () => 
       el('p', { className: 'dialog__note', text: 'Anyone with this link can edit the design, so keep it private.' }),
       status,
     ],
-    actions: [copy, save, button('Close', () => dialog.close(), { variant: 'ghost', testId: 'save-close' })],
+    actions: [copy, ...(share ? [share] : []), save, button('Close', () => dialog.close(), { variant: 'ghost', testId: 'save-close' })],
   });
   return dialog;
 }

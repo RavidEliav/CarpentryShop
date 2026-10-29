@@ -6,13 +6,14 @@ from __future__ import annotations
 
 import json
 from datetime import date
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import APIRouter, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from app.agent.language import LANGUAGES, Language
 from app.api.agent import error
 from app.domain.apply import apply_ops
 from app.domain.catalog import load_catalog
@@ -31,17 +32,17 @@ MAX_CONCURRENT_RENDERS = 2
 _active_renders = 0  # only touched on the event loop thread
 
 MESSAGES = {
-    "INVALID_REQUEST": {"he": "הבקשה אינה תקינה.", "en": "The request is not valid."},
-    "TOO_LARGE": {"he": "העיצוב גדול מדי לייצוא.", "en": "The design is too large to export."},
-    "INVALID_IMAGE": {"he": "תמונת הארון אינה תקינה.", "en": "The wardrobe picture is not valid."},
-    "BUSY": {"he": "השרת עסוק בהכנת קבצים אחרים. נסה שוב בעוד רגע.", "en": "The server is busy preparing other files. Please try again in a moment."},
+    "INVALID_REQUEST": {"he": "הבקשה אינה תקינה.", "en": "The request is not valid.", "es": "La solicitud no es válida."},
+    "TOO_LARGE": {"he": "העיצוב גדול מדי לייצוא.", "en": "The design is too large to export.", "es": "El diseño es demasiado grande para exportarlo."},
+    "INVALID_IMAGE": {"he": "תמונת הארון אינה תקינה.", "en": "The wardrobe picture is not valid.", "es": "La imagen del armario no es válida."},
+    "BUSY": {"he": "השרת עסוק בהכנת קבצים אחרים. נסה שוב בעוד רגע.", "en": "The server is busy preparing other files. Please try again in a moment.", "es": "El servidor está preparando otros archivos. Inténtalo de nuevo en un momento."},
 }
 
 
 class ExportRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     design: dict
-    language: Literal["he", "en"] = "he"
+    language: Language = "he"
     image: Annotated[str, Field(max_length=2_700_000)] | None = None  # data:image/(png|jpeg);base64,...
 
 
@@ -70,7 +71,7 @@ async def export_pdf(request: Request):
         raw = json.loads(body)
     except (ValueError, RecursionError):  # RecursionError: deeply nested arrays
         raw = None
-    language = raw.get("language") if isinstance(raw, dict) and raw.get("language") in ("he", "en") else "he"
+    language = raw.get("language") if isinstance(raw, dict) and raw.get("language") in LANGUAGES else "he"
     try:
         parsed = ExportRequest.model_validate(raw)
     except ValidationError:

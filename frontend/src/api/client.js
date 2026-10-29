@@ -94,7 +94,7 @@ function pdfFilename(disposition) {
 }
 
 /**
- * The carpenter PDF: { design, language: 'he'|'en', image? } -> { blob, filename }. `image` is the
+ * The carpenter PDF: { design, language: 'he'|'en'|'es', image? } -> { blob, filename }. `image` is the
  * app's own 3D snapshot (a JPEG/PNG data URL); without it the PDF uses its drawn illustration.
  */
 export async function exportPdf({ design, language, image = null }, fetchImpl = fetch) {

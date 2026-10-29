@@ -205,3 +205,16 @@ def test_worst_case_batch_stays_within_cpu_budget(catalog):
     started = time.perf_counter()
     apply_ops(None, ops, catalog)
     assert time.perf_counter() - started < 2.0
+
+
+@pytest.mark.parametrize("name", ["two", "basic"])
+def test_mirror_layout_mirrors_every_compartment_in_place(name, catalog):
+    from .conftest import load_design
+
+    design = load_design(name)
+    result = apply_ops(design, [{"op": "mirror_layout"}], catalog)
+    width = interior_width(design)
+    assert interior_width(result) == width  # width invariant
+    before = dict(zip((c["id"] for c in design["compartments"]), compartment_x_ranges(design), strict=True))
+    after = dict(zip((c["id"] for c in result["compartments"]), compartment_x_ranges(result), strict=True))
+    assert after == {cid: (width - x1, width - x0) for cid, (x0, x1) in before.items()}

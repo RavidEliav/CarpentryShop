@@ -12,6 +12,8 @@ import { createStore } from './state/store.js';
 import { browserStorage, clearDraft, draftToOffer, formatDraftTime, readDraft, watchDraft } from './state/draft.js';
 import { mountPanel } from './editor/panel.js';
 import { createViewer } from './viewer/viewer.js';
+import { createUnitPreference } from './units/displayUnits.js';
+import { createUnitSelector } from './units/unitSelector.js';
 import { renderSnapshot } from './viewer/snapshot.js';
 import { createChatModel } from './chat/chatModel.js';
 import { createLanguage } from './chat/i18n.js';
@@ -129,7 +131,9 @@ async function boot() {
     designId, loadedDesign: store.getState().design,
   });
   const draft = watchDraft(store, { storage, getDesignId: () => designId });
-  const viewer = createViewer(document.getElementById('viewer'), store);
+  const units = createUnitPreference();
+  const viewer = createViewer(document.getElementById('viewer'), store, { units });
+  createUnitSelector({ container: document.getElementById('unit-selector'), units });
   bindInteriorToggle(store);
   bindSkipLink();
   const toaster = createToaster();
@@ -137,10 +141,10 @@ async function boot() {
   const exporter = createExportDialog({
     getDesign: () => store.getState().design,
     getLanguage: () => language.get(),
-    getSnapshot: (design) => renderSnapshot(design, store.getState().catalog),
+    getSnapshot: (design, options) => renderSnapshot(design, store.getState().catalog, options),
     notify,
   });
-  mountPanel(document.getElementById('properties-content'), store, { onExport: exporter.open });
+  mountPanel(document.getElementById('properties-content'), store, { onExport: exporter.open, units });
   bindDialogs({
     storage: health?.data.storage === true,
     onSave: createSaver(store, language, session, (saved) => {

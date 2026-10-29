@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { createLanguage, DEFAULT_LANGUAGE, detectLanguage, LANGUAGES, STRINGS, stringsFor } from '../../../src/chat/i18n.js';
 
@@ -64,5 +65,29 @@ describe('detectLanguage', () => {
     expect(detectLanguage('Add a shelf')).toBe('en');
     expect(detectLanguage('תצבע ב-Walnut')).toBe('he');
     expect(detectLanguage('240?')).toBeNull();
+  });
+});
+
+describe('Spanish', () => {
+  // The same cases run in the backend (tests/agent/test_spanish.py), so both sides detect alike.
+  const fixture = JSON.parse(readFileSync(new URL('../../../../shared/fixtures/language/detect.json', import.meta.url), 'utf-8'));
+
+  it.each(fixture.cases.map((c) => [c.text, c.chosen, c.expected]))('detectLanguage(%j, %j) is %j', (text, chosen, expected) => {
+    expect(detectLanguage(text, chosen)).toBe(expected);
+  });
+
+  it('is a chat language with Spanish UI text', () => {
+    expect(LANGUAGES).toEqual(['he', 'en', 'es']);
+    expect(stringsFor('es').confirm).toBe('Confirmar');
+    expect(stringsFor('es').changeCount(3)).toBe('3 cambios');
+    expect(stringsFor('es').dir).toBe('ltr');
+  });
+
+  it('can be chosen and remembered', () => {
+    const data = {};
+    const storage = { getItem: (k) => data[k] ?? null, setItem: (k, v) => { data[k] = v; } };
+    const language = createLanguage({ storage });
+    language.set('es');
+    expect(createLanguage({ storage }).get()).toBe('es');
   });
 });

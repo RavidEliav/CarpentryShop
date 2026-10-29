@@ -8,10 +8,19 @@ import json
 from app.agent.language import INSTRUCTION, Language
 from app.domain.defaults import LIMITS
 from app.domain.geometry import compartment_x_ranges, interior_height, interior_width
+from app.export.strings import CATALOG_NAMES
 
 
 def _compact(value: object) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def _with_hebrew_names(catalog: dict) -> dict:
+    """The catalog with each entry's Hebrew name, so a Hebrew request ("ירוק זית") maps to its id
+    directly instead of relying on the model's own translation."""
+    names = CATALOG_NAMES["he"]
+    return {section: [{**entry, "nameHe": names[entry["id"]]} if entry["id"] in names else entry for entry in entries]
+            for section, entries in catalog.items()}
 
 
 def _free_spans(compartment: dict, height: int) -> list[list[int]]:
@@ -39,7 +48,7 @@ You ONLY help with designing this wardrobe and closely related design topics:
 - materials, colours, finishes, wood types and how they look together
 - storage planning: what to put where, how much hanging vs shelves, ergonomic heights
 - how the wardrobe fits the room and its style (bedroom, kids' room, walk-in, colour matching)
-- finishing the design: saying they are done or happy with it ("סיימתי", "זה מושלם", "I'm done"), \
+- finishing the design: saying they are done or happy with it ("סיימתי", "זה מושלם", "I'm done", "ya terminé"), \
 or asking for the file / PDF / drawings for the carpenter or the style profile -> ON-TOPIC, call \
 `offer_style_profile`
 Everything else is OFF-TOPIC and must go to `decline_off_topic`, including: small talk and \
@@ -99,6 +108,9 @@ hingeSide}] (hinged; omit for one door per compartment), count? (sliding, defaul
 - modify_compartment: compartmentId, width - the right neighbour absorbs the difference.
 - add_partition: compartmentId, offset - splits a compartment at offset mm from its left.
 - modify_partition: partitionId, position?, thickness?
+- mirror_layout: (no fields) - reverses the compartment order left to right ("תהפוך את \
+הסידור", "flip the layout"). Ids, widths and contents stay with their compartment; hinged doors \
+swap hinge sides.
 - add_shelf: compartmentId, y, thickness? | modify_shelf: id, y?, thickness?
 - add_drawer: compartmentId, y, height | modify_drawer: id, y?, height?
 - add_rail: compartmentId, y | modify_rail: id, y
@@ -132,7 +144,7 @@ def build_system_prompt(design: dict, catalog: dict, language: Language = "he") 
     # Static text first and the per-turn data last, so the provider can cache the prefix.
     return (
         SYSTEM_PROMPT.replace("{limits}", limits)
-        + "\n## Catalog (data)\n" + _compact(catalog)
+        + "\n## Catalog (data)\n" + _compact(_with_hebrew_names(catalog))
         + "\n\n## Current design (data, the state your ops apply to)\n" + _compact(design)
         + "\n\n## Derived facts (mm; a new shelf/drawer must fit entirely inside one freeY gap)\n" + _compact(facts)
         + "\n\n## RESPONSE LANGUAGE\n" + INSTRUCTION[language]

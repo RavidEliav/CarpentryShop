@@ -4,7 +4,8 @@
     { "id": "melamine", "name": "Melamine board" },
     { "id": "oak_veneer", "name": "Oak veneer" },
     { "id": "lacquered_mdf", "name": "Lacquered MDF" },
-    { "id": "birch_plywood", "name": "Birch plywood" }
+    { "id": "birch_plywood", "name": "Birch plywood" },
+    { "id": "solid_oak", "name": "Solid oak" }
   ],
   "colors": [
     { "id": "white", "name": "White", "hex": "#f2f1ed" },
@@ -15,7 +16,9 @@
     { "id": "walnut", "name": "Walnut", "hex": "#6b4a32" },
     { "id": "sage_green", "name": "Sage green", "hex": "#8f9e83" },
     { "id": "navy_blue", "name": "Navy blue", "hex": "#2b3a52" },
-    { "id": "sand_beige", "name": "Sand beige", "hex": "#d9c8ad" }
+    { "id": "sand_beige", "name": "Sand beige", "hex": "#d9c8ad" },
+    { "id": "olive_green", "name": "Olive green", "hex": "#6b6f45" },
+    { "id": "terracotta", "name": "Terracotta", "hex": "#b5654a" }
   ],
   "finishes": [
     { "id": "matte", "name": "Matte" },

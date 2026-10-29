@@ -60,12 +60,25 @@ The visual design follows the Stitch design system documented in `/.stitch/DESIG
 | `state/draft.js`, `entry/draftPrompt.js` | Automatic draft. Every design change (manual or a confirmed AI proposal, not selection or view changes) is kept in `localStorage` (`banai.draft`: design, time and the saved link's design id, never its token). After a reload, a changed draft for the same design is offered: a "Continue your draft" card on the start screen, or a small dialog when the page was opened from a saved link. A draft is validated before it is offered; anything broken is deleted silently, and blocked storage is ignored. One slot: the newest work replaces it. E2E specs start without a draft; `draft.spec.js` opts in with `test.use({ keepDraft: true })`. |
 | `share/saveDialog.js`, `render/renderDialog.js` | Save/share and render dialogs on the native `<dialog>`. Actions are disabled and say so until Phases 7 and 8. Render is labelled as illustrative. |
 | `ui/icons.js`, `ui/dialog.js`, `ui/logo.js`, `ui/ripple.js` | Inline SVG icons and logo (no icon font, image or CDN), a Material 3 dialog helper, and a delegated press ripple. |
-| `ui/tour.js` | First-visit introduction tour: three bubbles (chat, properties panel, 3D view) in one native modal `<dialog>`, with Back, Next, Skip and Done. It shows by itself once, after the start screen or on a first visit through a shared link. It is remembered in `localStorage` (`banai.tour.seen`) when it is finished, skipped or closed with Esc. The "?" button in the top bar replays it. The texts live in `chat/i18n.js` and follow the chat language (Hebrew right to left). It never touches the design. E2E specs start with the tour marked as seen; `tour.spec.js` opts out with `test.use({ seenTour: false })`. |
 | `ui/toast.js` | Short confirmations at the bottom centre: "Change applied" (a confirmed AI proposal), "Design saved", "Link copied" and "PDF ready". One polite live region (`role="status"`) reads them aloud. Each leaves after 3 s; hovering pauses the timer. At most three show at once. While a modal dialog is open the page behind it is inert, so the region moves inside that dialog. It is a manual popover, so the top layer keeps it above the dialog and placed against the window. Texts are English, set with `textContent`. |
+| `ui/tour.js` | First-visit introduction tour: three bubbles (chat, properties panel, 3D view) in one native modal `<dialog>`, with Back, Next, Skip and Done. It shows by itself once, after the start screen or on a first visit through a shared link. It is remembered in `localStorage` (`banai.tour.seen`) when it is finished, skipped or closed with Esc. The "?" button in the top bar replays it. The texts live in `chat/i18n.js` and follow the chat language (Hebrew right to left). It never touches the design. E2E specs start with the tour marked as seen; `tour.spec.js` opts out with `test.use({ seenTour: false })`. |
 
 Styles follow Material Design 3 (`styles/tokens.css` holds the `--md-sys-*` tokens, with the older names kept as aliases). The design record is `/.stitch/DESIGN.md`.
 Door hardware (handles, sliding rails, outlines) is built in `viewer/builders/doors.js` as non-selectable `kind: 'hardware'` objects. Picking refreshes world matrices before raycasting, so a click is correct even if it lands before the next rendered frame.
 In dev builds `window.__banai.chat` exposes the chat model, so a proposal can be shown for visual checks (`chat.setProposal({...})`).
+
+## Display units (`src/units/`)
+
+The unit selector in the top bar (cm | mm | in) changes **only how lengths are shown and typed**. The design stays in integer millimetres everywhere (store, ops, saved designs, AI, backend). It is a view preference like the chat language and the camera, so it lives outside the store.
+
+| Module | Role |
+|---|---|
+| `displayUnits.js` | Pure: `formatLength(mm, unit)`, `formatWithUnit`, `parseLength(text, unit)` (text to **integer mm**) and `createUnitPreference()` (`get` / `set` / `subscribe`, remembered in `localStorage` key `banai.unit`, default cm). |
+| `unitSelector.js` | The three buttons (`aria-pressed`, `data-testid` `unit-cm`, `unit-mm`, `unit-in`). Never imports the store. |
+
+- Decimals: cm 1, mm 0, in 2. `.` or `,` as decimal point; inches also accept fractions (`78 3/4`).
+- Typed values are rounded to the nearest integer mm before any op is dispatched, so an inch value can only reach whole millimetres (a re-typed value can differ by up to 0.5 mm from what was shown).
+- The editor fields (`lengthField`), the W/H/D labels and the selection label follow the unit. **Not affected:** the PDFs and the order summary (mm), and the AI's proposal texts (backend wording in cm).
 
 ## Testing
 - **Unit:** `npm test` (vitest). This covers the domain engine and parity fixtures, the store, the API client, and the builders.

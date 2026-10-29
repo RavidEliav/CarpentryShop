@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 const CLICK_TOLERANCE_PX = 5;
 
-export function attachPicking({ dom, camera, getTargets, onPick, onHover = () => {} }) {
+export function attachPicking({ dom, camera, getTargets, onPick, onHover = () => {}, onDoubleClick = () => {} }) {
   const raycaster = new THREE.Raycaster();
   let down = null;
 
@@ -39,13 +39,17 @@ export function attachPicking({ dom, camera, getTargets, onPick, onHover = () =>
     });
   };
 
+  const onDblClick = (event) => onDoubleClick(hitAt(event));
+
   dom.addEventListener('pointerdown', onPointerDown);
   dom.addEventListener('pointerup', onPointerUp);
   dom.addEventListener('pointermove', onPointerMove);
+  dom.addEventListener('dblclick', onDblClick);
   return () => {
     cancelAnimationFrame(hoverFrame);
     dom.removeEventListener('pointerdown', onPointerDown);
     dom.removeEventListener('pointerup', onPointerUp);
     dom.removeEventListener('pointermove', onPointerMove);
+    dom.removeEventListener('dblclick', onDblClick);
   };
 }
